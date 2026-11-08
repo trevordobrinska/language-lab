@@ -3,6 +3,7 @@
  * clock inside it. Content pack + History Log + time in, today's queue out;
  * a grade in, a History Log event out. Import it through this file only.
  */
-export { buildQueue, gradeCard, type Card, type GradeContext, type QueueInput } from "./review";
+export { buildQueue, cardSchedules, gradeCard, type Card, type GradeContext, type QueueInput } from "./review";
+export type { CardSchedule } from "./scheduler";
 export type { ContentPack, GrammarNote, Item, ItemKind, Sentence } from "./contentPack";
 export type { CardIntroducedEvent, CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
