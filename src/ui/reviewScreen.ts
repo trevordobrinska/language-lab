@@ -1,5 +1,6 @@
 import { buildQueue, gradeCard, type Card, type ContentPack, type Grade } from "../core";
 import { audioUrl } from "../content/packs";
+import { grammarNoteView, openGrammarNote } from "./grammarNoteView";
 import type { HistoryLogStore } from "../storage/historyLogStore";
 import { loadSettings, reviewSettings } from "../storage/settings";
 
@@ -33,7 +34,17 @@ export async function showReviewScreen({ root, pack, log, deviceId, onGraded }: 
     };
   };
 
+  /** A pattern's first appearance shows its Grammar Note before the card. */
   const showCard = (card: Card, remaining: number) => {
+    const note = card.noteBeforeCard;
+    if (!note) return showCardItself(card, remaining);
+    root.replaceChildren(
+      el("p", "remaining", `${remaining} to go`),
+      grammarNoteView(note, { heading: "New grammar", closeLabel: "Got it", onClose: () => showCardItself(card, remaining) }),
+    );
+  };
+
+  const showCardItself = (card: Card, remaining: number) => {
     const playFront = player(card.front.audio);
     const playBack = player(card.back.audio);
 
@@ -46,6 +57,8 @@ export async function showReviewScreen({ root, pack, log, deviceId, onGraded }: 
         root.append(
           ...back(card),
           ...(card.back.audio ? [button("play", "▶ Native audio", playBack)] : []),
+          // Reopen buttons sit in the reveal so they don't give the answer away on the front.
+          ...(card.grammarNotes ?? []).map((note) => button("open-note", `Grammar Note: ${note.pattern}`, () => openGrammarNote(root, note))),
           el("div", "grades", "", [
             button("grade again", "Again", () => grade(card, "again")),
             button("grade good", "Good", () => grade(card, "good")),
@@ -81,10 +94,13 @@ function front(card: Card): HTMLElement[] {
 
 /** The reveal: the answer; for Sentences, the Target Language with the new Item highlighted, and the English. */
 function back(card: Card): HTMLElement[] {
-  if (card.kind === "letter") return [el("div", "back", card.back.text)];
-  const { text, meaning, newItem } = card.back;
+  // Romanisation is only on the card during the learner's first week; the core decides.
+  const { text, meaning, newItem, romanisation } = card.back;
+  const romanised = romanisation ? [el("p", "romanisation", romanisation)] : [];
+  if (card.kind === "letter") return [el("div", "back", text), ...romanised];
   return [
     el("div", "back sentence", "", highlighted(text, newItem?.text)),
+    ...romanised,
     ...(meaning ? [el("div", "meaning", meaning)] : []),
     ...(newItem ? [el("div", "new-item", "", [el("mark", "", newItem.text), document.createTextNode(` = ${newItem.meaning}`)])] : []),
   ];

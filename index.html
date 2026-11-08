@@ -125,6 +125,61 @@
         margin-top: 40vh;
         font-size: 24px;
       }
+      .romanisation {
+        font-size: 20px;
+        margin: 0;
+        opacity: 0.6;
+        font-style: italic;
+      }
+      .grammar-note {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        text-align: left;
+      }
+      .grammar-note .note-heading {
+        margin: 0;
+        font-size: 16px;
+        opacity: 0.6;
+      }
+      .grammar-note .note-pattern {
+        margin: 0;
+        font-size: 40px;
+        text-align: center;
+      }
+      .grammar-note .note-meaning {
+        margin: 0;
+        font-size: 20px;
+        text-align: center;
+      }
+      .grammar-note .note-text,
+      .grammar-note .note-example {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.4;
+      }
+      .grammar-note .note-example {
+        padding: 12px;
+        background: #fff;
+        border-radius: 10px;
+      }
+      .grammar-note-overlay {
+        position: fixed;
+        inset: 0;
+        background: #f6f1e7;
+        overflow-y: auto;
+        padding: 24px 16px calc(24px + env(safe-area-inset-bottom));
+        box-sizing: border-box;
+      }
+      .grammar-note-overlay .grammar-note {
+        max-width: 520px;
+        margin: 0 auto;
+      }
+      .open-note {
+        font-size: 16px;
+        padding: 8px 12px;
+        border-width: 1px;
+      }
     </style>
   </head>
   <body>

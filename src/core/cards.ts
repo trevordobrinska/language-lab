@@ -33,7 +33,26 @@ export interface Card {
     readonly audio?: string;
     /** The Item this Sentence introduces, to highlight in the reveal. */
     readonly newItem?: { readonly text: string; readonly meaning: string };
+    /** Romanisation of the answer, shown on the reveal during the learner's first week only (see `romanisation.ts`). */
+    readonly romanisation?: string;
   };
+  /** Grammar Notes for the patterns this card uses, to reopen from the card. Absent if it uses none with a note. */
+  readonly grammarNotes?: readonly CardGrammarNote[];
+  /** The Grammar Note to show before this card: set only on the pattern's first appearance (see `grammarNotes.ts`). */
+  readonly noteBeforeCard?: CardGrammarNote;
+}
+
+/** A Grammar Note as a card shows it: the note plus the pattern it explains. */
+export interface CardGrammarNote {
+  /** The grammar-pattern Item's ID. */
+  readonly itemId: string;
+  /** The pattern as written in the Target Language, e.g. "주세요". */
+  readonly pattern: string;
+  /** The pattern's English meaning. */
+  readonly meaning: string;
+  /** Two or three sentences of explanation. */
+  readonly text: string;
+  readonly example?: string;
 }
 
 export const letterCardId = (itemId: string) => `letter:${itemId}`;
@@ -55,7 +74,7 @@ export function letterCard(item: Item): Card {
     kind: "letter",
     itemIds: [item.id],
     front: { text: item.text, audio: item.audio },
-    back: { text: item.meaning },
+    back: { text: item.meaning, ...romanised(item.romanisation) },
   };
 }
 
@@ -65,7 +84,7 @@ export function listeningCard(sentence: Sentence, newItem: Item | undefined): Ca
     kind: "listening",
     itemIds: sentence.itemIds,
     front: { audio: sentence.audio },
-    back: { text: sentence.text, meaning: sentence.meaning, ...highlight(newItem) },
+    back: { text: sentence.text, meaning: sentence.meaning, ...highlight(newItem), ...romanised(sentence.romanisation) },
   };
 }
 
@@ -75,8 +94,12 @@ export function speakingCard(sentence: Sentence, newItem: Item | undefined): Car
     kind: "speaking",
     itemIds: sentence.itemIds,
     front: { text: sentence.meaning },
-    back: { text: sentence.text, meaning: sentence.meaning, audio: sentence.audio, ...highlight(newItem) },
+    back: { text: sentence.text, meaning: sentence.meaning, audio: sentence.audio, ...highlight(newItem), ...romanised(sentence.romanisation) },
   };
+}
+
+function romanised(romanisation: string | undefined) {
+  return romanisation ? { romanisation } : {};
 }
 
 function highlight(item: Item | undefined) {

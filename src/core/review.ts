@@ -2,10 +2,12 @@ import { packCards, type Card } from "./cards";
 import type { ContentPack } from "./contentPack";
 import type { CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
 import { capNewCards, capReviews, DEFAULT_REVIEW_SETTINGS, mostAtRiskFirst, type ReviewSettings } from "./dailyCaps";
+import { withGrammarNotes } from "./grammarNotes";
 import { newMaterial } from "./newMaterial";
+import { applyRomanisationWeek, inRomanisationWeek } from "./romanisation";
 import { schedule, type CardSchedule, type PastReview } from "./scheduler";
 
-export type { Card, CardKind } from "./cards";
+export type { Card, CardGrammarNote, CardKind } from "./cards";
 
 export interface QueueInput {
   readonly pack: ContentPack;
@@ -41,7 +43,9 @@ export function buildQueue({ pack, events, now, settings }: QueueInput): Card[] 
   const comingBack = reviews.filter(
     (card) => dueBy(card) > now.getTime() && dueBy(card) <= now.getTime() + LEARN_AHEAD_MS,
   );
-  return [...interleave(dueReviews, newCards), ...comingBack];
+  const queue = [...interleave(dueReviews, newCards), ...comingBack];
+  const romanised = applyRomanisationWeek(queue, inRomanisationWeek(events, now, day.settings.utcOffsetMinutes));
+  return withGrammarNotes(romanised, pack, events);
 }
 
 /** Alternates the two lists (a first), then the rest of whichever is longer. */
