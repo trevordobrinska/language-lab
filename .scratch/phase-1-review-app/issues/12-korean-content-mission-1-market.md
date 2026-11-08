@@ -9,7 +9,7 @@
 - [x] About 150 word Items tagged Mission 1, each introduced by a Sentence with exactly one new Item
 - [x] All Sentences use polite speech (해요체)
 - [x] Every grammar pattern used has a Grammar Note
-- [ ] Every Sentence has English, romanisation and generated audio
+- [x] Every Sentence has English, romanisation and generated audio
 - [ ] Korean has been spot-checked against a dictionary (e.g. Naver Dictionary), with doubtful sentences flagged for the user
 - [x] The content check passes
 

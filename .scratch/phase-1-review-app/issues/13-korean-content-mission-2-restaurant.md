@@ -8,7 +8,7 @@
 
 - [x] About 150 word Items tagged Mission 2, each introduced by a Sentence with exactly one new Item, building only on earlier Items
 - [x] All Sentences use polite speech, with Grammar Notes for any new patterns
-- [ ] Every Sentence has English, romanisation and generated audio
+- [x] Every Sentence has English, romanisation and generated audio
 - [ ] Korean has been spot-checked against a dictionary, with doubtful sentences flagged for the user
 - [x] The content check passes, and the Korean pack totals about 300 word Items
 

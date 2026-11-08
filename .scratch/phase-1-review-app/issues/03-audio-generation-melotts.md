@@ -4,13 +4,13 @@
 
 **Blocked by:** 01
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] Setup steps for MeloTTS on Windows are documented (installing it may need the user to step in, so flag it if it does)
-- [ ] One command generates compressed audio for every Sentence and audio-bearing Item in the pack
+- [x] One command generates compressed audio for every Sentence and audio-bearing Item in the pack
 - [x] Running it again creates no new files. Adding one Sentence generates exactly one new file
-- [ ] The file names and references match what the content pack expects, and the content check passes
-- [ ] Placeholder audio from 01 is replaced
+- [x] The file names and references match what the content pack expects, and the content check passes
+- [x] Placeholder audio from 01 is replaced
 
 ## Comments
 
@@ -35,3 +35,5 @@
 2. Run `npm run audio`. The first run downloads the Korean model and BERT. Then run it again and confirm it prints "All audio already exists". This closes boxes 2 and 5.
 3. Listen-check the clips. Check the bare-jamo letter clips in particular (e.g. `ㄱ`): MeloTTS may say them oddly. If so, ask a session to change what's spoken for letters.
 4. Run `npm test`, with ticket 02's content check merged, to confirm the mp3 references resolve. Then commit `content/ko/`. This closes box 4.
+
+- 2026-11-08: User ran `npm run audio`; 390 mp3s generated (7.7 MB), all placeholders replaced, `npm test` passes (105).
