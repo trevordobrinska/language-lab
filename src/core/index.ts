@@ -6,3 +6,4 @@
 export { buildQueue, gradeCard, type Card, type GradeContext, type QueueInput } from "./review";
 export type { ContentPack, GrammarNote, Item, ItemKind, Sentence } from "./contentPack";
 export type { CardIntroducedEvent, CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
+export { checkContentPack } from "./contentCheck";
