@@ -5,6 +5,8 @@
  * citation (spec "Further Notes").
  */
 
+import { button, el } from "./dom";
+
 export interface Method {
   readonly name: string;
   readonly tier: "strong" | "promising";
@@ -39,7 +41,7 @@ export const METHODS: readonly Method[] = [
     citation: "Norris & Ortega 2000; Spada & Tomita 2010",
   },
   {
-    name: "Recognition before production",
+    name: "Listening Cards before Speaking Cards",
     tier: "promising",
     why: "You hear and understand a sentence (Listening Card) a few times before you're asked to say it (Speaking Card). How early to speak is still debated.",
     citation: "VanPatten & Cadierno 1993; the speak-early vs. silent-period debate",
@@ -66,9 +68,7 @@ export interface HowReviewWorksDeps {
 }
 
 export function showHowReviewWorks({ root, doneLabel, onDone }: HowReviewWorksDeps): void {
-  const steps = document.createElement("ol");
-  steps.className = "steps";
-  steps.append(...STEPS.map((step) => el("li", "", step)));
+  const steps = el("ol", "steps", "", STEPS.map((step) => el("li", "", step)));
 
   const methods = el("section", "methods", "", [
     el("h2", "", "Why it works"),
@@ -82,16 +82,5 @@ export function showHowReviewWorks({ root, doneLabel, onDone }: HowReviewWorksDe
     el("p", "hint", "Strong: well backed by research. Promising: used here, but the evidence is weaker."),
   ]);
 
-  const done = el("button", "start", doneLabel) as HTMLButtonElement;
-  done.addEventListener("click", onDone);
-
-  root.replaceChildren(el("h1", "page-title", "How Review works"), steps, methods, done);
-}
-
-function el(tag: string, className: string, text: string, children: Node[] = []): HTMLElement {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  node.textContent = text;
-  node.append(...children);
-  return node;
+  root.replaceChildren(el("h1", "page-title", "How Review works"), steps, methods, button("start", doneLabel, onDone));
 }

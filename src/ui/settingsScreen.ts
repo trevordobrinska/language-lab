@@ -1,5 +1,6 @@
 import { DEFAULT_REVIEW_SETTINGS } from "../core";
 import { loadSettings, syncTarget, updateSettings, type Settings } from "../storage/settings";
+import { button, el } from "./dom";
 
 export interface SettingsScreenDeps {
   readonly root: HTMLElement;
@@ -133,19 +134,5 @@ function input(type: string, placeholder: string, value = ""): HTMLInputElement 
 function labelled(text: string, control: HTMLElement): HTMLElement {
   const node = document.createElement("label");
   node.append(text, control);
-  return node;
-}
-
-function el(tag: string, className: string, text: string, children: Node[] = []): HTMLElement {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  node.textContent = text;
-  node.append(...children);
-  return node;
-}
-
-function button(className: string, text: string, onClick: () => void): HTMLButtonElement {
-  const node = el("button", className, text) as HTMLButtonElement;
-  node.addEventListener("click", onClick);
   return node;
 }

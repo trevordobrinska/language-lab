@@ -1,5 +1,6 @@
 import { buildQueue, gradeCard, type Card, type ContentPack, type Grade } from "../core";
 import { audioUrl } from "../content/packs";
+import { button, el } from "./dom";
 import { grammarNoteView, openGrammarNote } from "./grammarNoteView";
 import type { HistoryLogStore } from "../storage/historyLogStore";
 import { loadSettings, reviewSettings } from "../storage/settings";
@@ -140,18 +141,4 @@ function showWaiting(root: HTMLElement, until: Date, carryOn: () => Promise<void
 
 function showDone(root: HTMLElement) {
   root.replaceChildren(el("div", "done", "That's today's Review done."));
-}
-
-function el(tag: string, className: string, text: string, children: Node[] = []): HTMLElement {
-  const node = document.createElement(tag);
-  node.className = className;
-  node.textContent = text;
-  node.append(...children);
-  return node;
-}
-
-function button(className: string, text: string, onClick: () => void): HTMLButtonElement {
-  const node = el("button", className, text) as HTMLButtonElement;
-  node.addEventListener("click", onClick);
-  return node;
 }

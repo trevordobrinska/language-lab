@@ -1,6 +1,7 @@
 import { progress, type ContentPack, type Tally } from "../core";
 import type { HistoryLogStore } from "../storage/historyLogStore";
 import { loadSettings, reviewSettings } from "../storage/settings";
+import { el } from "./dom";
 
 export interface ProgressScreenDeps {
   readonly root: HTMLElement;
@@ -55,12 +56,4 @@ function row(label: string, value: string, tally?: Tally, note?: string): HTMLEl
   }
   if (note) children.push(el("p", "hint", note));
   return el("section", "stat", "", children);
-}
-
-function el(tag: string, className: string, text: string, children: Node[] = []): HTMLElement {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  node.textContent = text;
-  node.append(...children);
-  return node;
 }
