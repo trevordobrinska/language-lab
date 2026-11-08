@@ -1,3 +1,4 @@
+import type { ReviewSettings } from "../core";
 import { STORAGE_PREFIX } from "./historyLogStore";
 
 /**
@@ -11,6 +12,9 @@ export interface Settings {
   readonly dataRepoName?: string;
   /** When the last sync succeeded, as an ISO 8601 date and time. */
   readonly lastSyncAt?: string;
+  /** Daily caps (spec "Missed days"). Unset means the core's defaults (15 and 150). */
+  readonly newItemsPerDay?: number;
+  readonly reviewsPerDay?: number;
 }
 
 const KEY = `${STORAGE_PREFIX}:settings`;
@@ -28,6 +32,22 @@ export function updateSettings(changes: Partial<Settings>): Settings {
   const settings = { ...loadSettings(), ...changes };
   localStorage.setItem(KEY, JSON.stringify(settings));
   return settings;
+}
+
+/**
+ * What `buildQueue` needs from the settings: the daily caps plus this
+ * device's current timezone, so "today" is the learner's local day.
+ */
+export function reviewSettings(settings: Settings, now: Date): Partial<ReviewSettings> {
+  return {
+    ...(isCap(settings.newItemsPerDay) && { newItemsPerDay: settings.newItemsPerDay }),
+    ...(isCap(settings.reviewsPerDay) && { reviewsPerDay: settings.reviewsPerDay }),
+    utcOffsetMinutes: -now.getTimezoneOffset(),
+  };
+}
+
+function isCap(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
 /** The sync target, if the learner has set one up. */

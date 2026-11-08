@@ -1,6 +1,7 @@
 import { buildQueue, gradeCard, type Card, type ContentPack, type Grade } from "../core";
 import { audioUrl } from "../content/packs";
 import type { HistoryLogStore } from "../storage/historyLogStore";
+import { loadSettings, reviewSettings } from "../storage/settings";
 
 export interface ReviewScreenDeps {
   readonly root: HTMLElement;
@@ -18,7 +19,9 @@ export interface ReviewScreenDeps {
  */
 export async function showReviewScreen({ root, pack, log, deviceId, onGraded }: ReviewScreenDeps): Promise<void> {
   const next = async () => {
-    const queue = buildQueue({ pack, events: await log.all(), now: new Date() });
+    const now = new Date();
+    // Settings are read each time, so changed caps apply to the very next queue.
+    const queue = buildQueue({ pack, events: await log.all(), now, settings: reviewSettings(loadSettings(), now) });
     if (queue.length === 0) showDone(root);
     else showCard(queue[0], queue.length);
   };
