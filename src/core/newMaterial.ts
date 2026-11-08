@@ -1,11 +1,24 @@
-import { isLetterOrSound, letterCard, letterCardId, listeningCard, listeningCardId, type Card } from "./cards";
+import {
+  isLetterOrSound,
+  letterCard,
+  letterCardId,
+  listeningCard,
+  listeningCardId,
+  speakingCard,
+  speakingCardId,
+  type Card,
+} from "./cards";
 import type { ContentPack, Item, Sentence } from "./contentPack";
+import { startOfDay } from "./dailyCaps";
 import type { HistoryEvent } from "./historyLog";
 
 /**
  * The new cards on offer today, in the order to introduce them (ticket 07).
  *
- * - Letter and sound Items come first, in the authored order.
+ * - Speaking Cards just unlocked come first: a Sentence's Speaking Card
+ *   unlocks once its Listening Card has been graded Good on two separate
+ *   days (the learner's local days). They bring in no new Item.
+ * - Then letter and sound Items, in the authored order.
  * - A Sentence is eligible only when every letter or sound Item it lists has
  *   been met and exactly one of its other Items is new to the learner.
  * - Among eligible Sentences, one whose new Item serves Mission 1 (the
@@ -15,12 +28,18 @@ import type { HistoryEvent } from "./historyLog";
  * Sentence can make the next one eligible within the same queue. Daily caps
  * are applied by the caller.
  */
-export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[]): Card[] {
+export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[], utcOffsetMinutes: number): Card[] {
   const seen = new Set(events.map((event) => event.cardId));
   const items = new Map(pack.items.map((item) => [item.id, item]));
   const sentences = pack.order.flatMap((id) => pack.sentences.filter((s) => s.id === id));
   const met = metItems(pack, seen);
+  const goodDays = goodDaysByCard(events, utcOffsetMinutes);
   const cards: Card[] = [];
+
+  for (const s of sentences) {
+    const unlocked = (goodDays.get(listeningCardId(s.id))?.size ?? 0) >= SPEAKING_UNLOCK_GOOD_DAYS;
+    if (unlocked && !seen.has(speakingCardId(s.id))) cards.push(speakingCard(s, items.get(s.introduces)));
+  }
 
   for (const id of pack.order) {
     const item = items.get(id);
@@ -43,6 +62,21 @@ export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[]):
     waiting = waiting.filter((s) => s !== next);
   }
   return cards;
+}
+
+/** A Sentence's Speaking Card unlocks once its Listening Card has been graded Good on this many separate days. */
+const SPEAKING_UNLOCK_GOOD_DAYS = 2;
+
+/** The learner's local days (as day-start times) on which each card was graded Good. */
+function goodDaysByCard(events: readonly HistoryEvent[], utcOffsetMinutes: number): Map<string, Set<number>> {
+  const days = new Map<string, Set<number>>();
+  for (const event of events) {
+    if (event.type !== "card-reviewed" || event.grade !== "good") continue;
+    const set = days.get(event.cardId) ?? new Set<number>();
+    set.add(startOfDay(new Date(event.at), utcOffsetMinutes).getTime());
+    days.set(event.cardId, set);
+  }
+  return days;
 }
 
 /** Items the learner has met: letters whose card they've seen, and every Item in a Sentence they've heard. */

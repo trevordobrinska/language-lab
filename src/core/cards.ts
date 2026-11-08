@@ -40,6 +40,12 @@ export const letterCardId = (itemId: string) => `letter:${itemId}`;
 export const listeningCardId = (sentenceId: string) => `listening:${sentenceId}`;
 export const speakingCardId = (sentenceId: string) => `speaking:${sentenceId}`;
 
+/**
+ * Whether a new card brings in a new Item, so it counts towards the daily
+ * new-Item cap. A Speaking Card practises a Sentence already heard, so it doesn't.
+ */
+export const bringsNewItem = (cardId: string) => !cardId.startsWith("speaking:");
+
 /** Items whose cards are letter cards: the script and its sounds, met before any Sentence. */
 export const isLetterOrSound = (item: Item) => item.kind === "letter" || item.kind === "sound";
 

@@ -29,7 +29,7 @@ export function buildQueue({ pack, events, now, settings }: QueueInput): Card[] 
   const schedules = cardSchedules({ events, now });
   const cards = packCards(pack);
   const dueBy = (card: Card) => schedules.get(card.id)?.due.getTime() ?? now.getTime();
-  const newCards = capNewCards(newMaterial(pack, events), day);
+  const newCards = capNewCards(newMaterial(pack, events, day.settings.utcOffsetMinutes), day);
   const reviews = cards.filter((card) => schedules.has(card.id)).sort((a, b) => dueBy(a) - dueBy(b));
   const dueReviews = capReviews(
     mostAtRiskFirst(

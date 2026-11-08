@@ -37,6 +37,56 @@ describe("Listening Cards", () => {
   });
 });
 
+describe("Speaking Cards", () => {
+  const pack = packWith([...letters, ne], [sNe]);
+  const heard = (...goods: Date[]) => [...lettersMet(START), ...goods.map((at) => reviewed("listening:s-ne", "good", at))];
+
+  it("don't appear before the Listening Card has been graded Good on two separate days", () => {
+    const sameDayTwice = [
+      ...lettersMet(START),
+      reviewed("listening:s-ne", "again", START),
+      reviewed("listening:s-ne", "good", later(START, 0, 0.2)),
+      reviewed("listening:s-ne", "good", later(START, 0, 2)),
+    ];
+    for (const day of [0, 1, 2, 3, 5]) {
+      expect(ids(buildQueue({ pack, events: heard(START), now: later(START, day) }))).not.toContain("speaking:s-ne");
+    }
+    expect(ids(buildQueue({ pack, events: sameDayTwice, now: later(START, 0, 3) }))).not.toContain("speaking:s-ne");
+  });
+
+  it("appear once the Listening Card has been graded Good on a second day: English first, then Hangul and native audio", () => {
+    const queue = buildQueue({ pack, events: heard(START, later(START, 2)), now: later(START, 2, 1) });
+
+    expect(queue).toContainEqual({
+      id: "speaking:s-ne",
+      kind: "speaking",
+      itemIds: ["ko-n", "ko-e", "w-ne"],
+      front: { text: "Yes." },
+      back: { text: "네.", meaning: "Yes.", audio: "audio/s-ne.wav", newItem: { text: "네", meaning: "yes" } },
+    });
+  });
+
+  it("count days in the learner's timezone", () => {
+    // 20:00 and 23:00 in New York are the same local day, though different UTC days.
+    const evening = new Date("2026-11-07T01:00:00Z");
+    const events = heard(evening, new Date("2026-11-07T04:00:00Z"));
+
+    const queue = buildQueue({ pack, events, now: new Date("2026-11-07T04:30:00Z"), settings: { utcOffsetMinutes: -300 } });
+
+    expect(ids(queue)).not.toContain("speaking:s-ne");
+  });
+
+  it("don't use up the new-Item cap", () => {
+    const sAniyo = sentence("s-aniyo", "아니요.", "No.", ["ko-ng", "ko-a", "ko-n", "ko-i", "ko-yo", "w-aniyo"]);
+    const two = packWith([...letters, ne, aniyo], [sNe, sAniyo]);
+    const events = [...lettersMet(later(START, -3)), ...heard(START, later(START, 2)).slice(letters.length)];
+
+    const queue = buildQueue({ pack: two, events, now: later(START, 2, 1), settings: { newItemsPerDay: 1 } });
+
+    expect(ids(queue)).toEqual(expect.arrayContaining(["speaking:s-ne", "listening:s-aniyo"]));
+  });
+});
+
 describe("introducing Sentences", () => {
   it("shows every Hangul letter before any Sentence", () => {
     const pack = packWith([...letters, ne], [sNe]);

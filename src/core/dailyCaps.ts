@@ -1,3 +1,4 @@
+import { bringsNewItem } from "./cards";
 import type { HistoryEvent } from "./historyLog";
 import type { CardSchedule } from "./scheduler";
 
@@ -59,12 +60,14 @@ export interface DayContext {
 
 /**
  * Keeps only as many of `newCards` (already in introduction order) as are
- * left of today's new-Item cap. Every card first seen today counts.
+ * left of today's new-Item cap. Every card first seen today that brings in
+ * a new Item counts; Speaking Cards bring in none, so they're never capped.
  */
 export function capNewCards<T extends { id: string }>(newCards: readonly T[], { events, now, settings }: DayContext): T[] {
   const dayStart = startOfDay(now, settings.utcOffsetMinutes).getTime();
-  const introducedToday = [...firstSeen(events).values()].filter((at) => at >= dayStart).length;
-  return newCards.slice(0, Math.max(0, settings.newItemsPerDay - introducedToday));
+  const introducedToday = [...firstSeen(events)].filter(([id, at]) => at >= dayStart && bringsNewItem(id)).length;
+  let left = settings.newItemsPerDay - introducedToday;
+  return newCards.filter((card) => !bringsNewItem(card.id) || left-- > 0);
 }
 
 /**
