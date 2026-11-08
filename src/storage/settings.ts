@@ -1,5 +1,5 @@
 import type { ReviewSettings } from "../core";
-import { STORAGE_PREFIX } from "./historyLogStore";
+import { STORAGE_PREFIX } from "./storagePrefix";
 
 /**
  * The learner's settings, kept on this device in localStorage. Add new

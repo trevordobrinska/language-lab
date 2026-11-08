@@ -1,4 +1,4 @@
-import { STORAGE_PREFIX } from "./historyLogStore";
+import { STORAGE_PREFIX } from "./storagePrefix";
 
 const KEY = `${STORAGE_PREFIX}:device-id`;
 

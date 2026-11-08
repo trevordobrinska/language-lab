@@ -1,6 +1,6 @@
 import { listeningCardId, speakingCardId, type Card, type CardGrammarNote } from "./cards";
 import type { ContentPack } from "./contentPack";
-import type { HistoryEvent } from "./historyLog";
+import { seenCardIds, type HistoryEvent } from "./historyLog";
 
 /**
  * When each Grammar Note is shown (spec "Review core").
@@ -16,7 +16,7 @@ export function withGrammarNotes(cards: readonly Card[], pack: ContentPack, even
   const notes = cardNotes(pack);
   if (notes.size === 0) return [...cards];
 
-  const seen = new Set(events.map((event) => event.cardId));
+  const seen = seenCardIds(events);
   const appeared = new Set<string>();
   for (const s of pack.sentences) {
     if (seen.has(listeningCardId(s.id)) || seen.has(speakingCardId(s.id))) for (const id of s.itemIds) appeared.add(id);

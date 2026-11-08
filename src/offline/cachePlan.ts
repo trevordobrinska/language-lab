@@ -1,4 +1,4 @@
-import { STORAGE_PREFIX } from "../storage/historyLogStore";
+import { STORAGE_PREFIX } from "../storage/storagePrefix";
 
 /**
  * Pure rules for the service worker's caches. Shared by the service worker

@@ -1,6 +1,6 @@
 import { packCards, type Card } from "./cards";
 import type { ContentPack } from "./contentPack";
-import type { CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
+import { byTimeThenId, type CardReviewedEvent, type Grade, type HistoryEvent } from "./historyLog";
 import { capNewCards, capReviews, DEFAULT_REVIEW_SETTINGS, mostAtRiskFirst, reviewedToday, type ReviewSettings } from "./dailyCaps";
 import { withGrammarNotes } from "./grammarNotes";
 import { newMaterial } from "./newMaterial";
@@ -37,7 +37,7 @@ export function buildQueue({ pack, events, now, settings }: QueueInput): Card[] 
   const schedules = cardSchedules({ events, now });
   const cards = packCards(pack);
   const dueBy = (card: Card) => schedules.get(card.id)?.due.getTime() ?? now.getTime();
-  const newCards = capNewCards(newMaterial(pack, events, day.settings.utcOffsetMinutes), day);
+  const newCards = capNewCards(newMaterial(pack, events, day.settings.utcOffsetMinutes), day, cards);
   const reviews = cards.filter((card) => schedules.has(card.id)).sort((a, b) => dueBy(a) - dueBy(b));
   const dueReviews = capReviews(
     mostAtRiskFirst(
@@ -77,18 +77,14 @@ export function cardSchedules({ events, now }: Pick<QueueInput, "events" | "now"
 }
 
 /**
- * Each card's reviews, oldest first. Ties break by event ID, so merged logs
- * replay the same way whatever order their events arrived in.
+ * Each card's reviews, oldest first (in `byTimeThenId` order).
  */
 function reviewsByCard(events: readonly HistoryEvent[]): Map<string, PastReview[]> {
-  const sorted = events
-    .filter((event): event is CardReviewedEvent => event.type === "card-reviewed")
-    .map((event) => ({ event, at: new Date(event.at) }))
-    .sort((a, b) => a.at.getTime() - b.at.getTime() || (a.event.id < b.event.id ? -1 : a.event.id > b.event.id ? 1 : 0));
+  const sorted = events.filter((event): event is CardReviewedEvent => event.type === "card-reviewed").sort(byTimeThenId);
   const byCard = new Map<string, PastReview[]>();
-  for (const { event, at } of sorted) {
+  for (const event of sorted) {
     const list = byCard.get(event.cardId) ?? [];
-    list.push({ grade: event.grade, at });
+    list.push({ grade: event.grade, at: new Date(event.at) });
     byCard.set(event.cardId, list);
   }
   return byCard;

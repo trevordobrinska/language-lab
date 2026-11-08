@@ -37,6 +37,11 @@ export interface Mission {
   readonly name: string;
 }
 
+/** Mission 1: the pack's first (most important) Mission, if it has any. */
+export function mission1(pack: ContentPack): Mission | undefined {
+  return pack.missions?.[0];
+}
+
 /**
  * - `letter`: one letter of the script (a Hangul jamo, a kana).
  * - `syllable`: letters combined into one written block (a Hangul syllable such as 산).

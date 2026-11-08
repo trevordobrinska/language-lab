@@ -5,9 +5,10 @@
  */
 export { buildQueue, cardSchedules, gradeCard, type Card, type CardGrammarNote, type CardKind, type GradeContext, type QueueInput } from "./review";
 export type { CardSchedule } from "./scheduler";
-export { DEFAULT_REVIEW_SETTINGS, startOfDay, type ReviewSettings } from "./dailyCaps";
+export { DEFAULT_REVIEW_SETTINGS, type ReviewSettings } from "./dailyCaps";
+export { startOfDay } from "./days";
 export type { ContentPack, GrammarNote, Item, ItemKind, Mission, Sentence } from "./contentPack";
 export { mergeLogs } from "./merge";
-export type { CardIntroducedEvent, CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
+export { byTimeThenId, type CardIntroducedEvent, type CardReviewedEvent, type Grade, type HistoryEvent } from "./historyLog";
 export { checkContentPack } from "./contentCheck";
 export { progress, type Progress, type Tally } from "./progress";

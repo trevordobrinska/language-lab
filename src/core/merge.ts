@@ -1,4 +1,4 @@
-import type { HistoryEvent } from "./historyLog";
+import { byTimeThenId, type HistoryEvent } from "./historyLog";
 
 /**
  * Joins History Logs (from several devices, or local + remote) into one.
@@ -9,7 +9,5 @@ import type { HistoryEvent } from "./historyLog";
 export function mergeLogs(...logs: readonly (readonly HistoryEvent[])[]): HistoryEvent[] {
   const byId = new Map<string, HistoryEvent>();
   for (const log of logs) for (const event of log) if (!byId.has(event.id)) byId.set(event.id, event);
-  return [...byId.values()].sort((a, b) => a.at.localeCompare(b.at) || compare(a.id, b.id));
+  return [...byId.values()].sort(byTimeThenId);
 }
-
-const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);

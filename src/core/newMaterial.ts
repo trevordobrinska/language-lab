@@ -8,9 +8,9 @@ import {
   speakingCardId,
   type Card,
 } from "./cards";
-import type { ContentPack, Item, Sentence } from "./contentPack";
-import { startOfDay } from "./dailyCaps";
-import type { HistoryEvent } from "./historyLog";
+import { mission1, type ContentPack, type Item, type Sentence } from "./contentPack";
+import { startOfDay } from "./days";
+import { seenCardIds, type HistoryEvent } from "./historyLog";
 
 /**
  * The new cards on offer today, in the order to introduce them (ticket 07).
@@ -29,7 +29,7 @@ import type { HistoryEvent } from "./historyLog";
  * are applied by the caller.
  */
 export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[], utcOffsetMinutes: number): Card[] {
-  const seen = new Set(events.map((event) => event.cardId));
+  const seen = seenCardIds(events);
   const items = new Map(pack.items.map((item) => [item.id, item]));
   const sentences = pack.order.flatMap((id) => pack.sentences.filter((s) => s.id === id));
   const known = knownItems(pack, events, seen);
@@ -49,8 +49,8 @@ export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[], 
     }
   }
 
-  const mission1 = pack.missions?.[0]?.id;
-  const servesMission1 = (itemId: string) => mission1 !== undefined && (items.get(itemId)?.missions.includes(mission1) ?? false);
+  const firstMission = mission1(pack)?.id;
+  const servesMission1 = (itemId: string) => firstMission !== undefined && (items.get(itemId)?.missions.includes(firstMission) ?? false);
 
   let waiting = sentences.filter((s) => !seen.has(listeningCardId(s.id)));
   for (;;) {

@@ -29,3 +29,27 @@ export interface CardIntroducedEvent extends EventBase {
 }
 
 export type HistoryEvent = CardReviewedEvent | CardIntroducedEvent;
+
+/**
+ * The one order of History Log events: oldest first, ties broken by event ID,
+ * so merged logs replay the same way whatever order their events arrived in.
+ */
+export function byTimeThenId(a: HistoryEvent, b: HistoryEvent): number {
+  return Date.parse(a.at) - Date.parse(b.at) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+}
+
+/** When each card first appeared in the History Log (introduced or first reviewed), as epoch ms by card ID. */
+export function firstSeen(events: readonly HistoryEvent[]): Map<string, number> {
+  const first = new Map<string, number>();
+  for (const event of events) {
+    const at = Date.parse(event.at);
+    const known = first.get(event.cardId);
+    if (known === undefined || at < known) first.set(event.cardId, at);
+  }
+  return first;
+}
+
+/** Every card ID with any event in the History Log. */
+export function seenCardIds(events: readonly HistoryEvent[]): Set<string> {
+  return new Set(events.map((event) => event.cardId));
+}

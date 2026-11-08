@@ -69,7 +69,7 @@ export const speakingCardId = (sentenceId: string) => `speaking:${sentenceId}`;
  * Whether a new card brings in a new Item, so it counts towards the daily
  * new-Item cap. A Speaking Card practises a Sentence already heard, so it doesn't.
  */
-export const bringsNewItem = (cardId: string) => !cardId.startsWith("speaking:");
+export const bringsNewItem = (card: Card) => card.kind !== "speaking";
 
 /** Items whose cards are letter cards: the script (letters, syllable blocks) and its sounds, met before any Sentence. */
 export const isLetterOrSound = (item: Item) => AUDIO_ITEM_KINDS.includes(item.kind);

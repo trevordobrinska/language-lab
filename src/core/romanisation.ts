@@ -1,5 +1,5 @@
 import type { Card } from "./cards";
-import { startOfDay } from "./dailyCaps";
+import { DAY_MS, startOfDay } from "./days";
 import type { HistoryEvent } from "./historyLog";
 
 /**
@@ -11,8 +11,6 @@ import type { HistoryEvent } from "./historyLog";
  * (today, for a learner with no events yet); days 1 to 7 inclusive count.
  */
 export const ROMANISATION_DAYS = 7;
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Whether `now` falls within the learner's first `ROMANISATION_DAYS` local days. */
 export function inRomanisationWeek(events: readonly HistoryEvent[], now: Date, utcOffsetMinutes: number): boolean {

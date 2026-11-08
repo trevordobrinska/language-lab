@@ -1,4 +1,4 @@
-import type { HistoryEvent } from "../core";
+import { byTimeThenId, type HistoryEvent } from "../core";
 
 /**
  * Where this device keeps its History Log. Add-only: events are never edited
@@ -11,9 +11,6 @@ export interface HistoryLogStore {
   all(): Promise<HistoryEvent[]>;
 }
 
-/** Every storage name the app creates starts with this (the domain is shared with the Arcade games). */
-export const STORAGE_PREFIX = "language-lab";
-
 /** A History Log kept in memory, for tests and as a stand-in. */
 export function memoryHistoryLog(): HistoryLogStore {
   const events = new Map<string, HistoryEvent>();
@@ -22,9 +19,7 @@ export function memoryHistoryLog(): HistoryLogStore {
       if (!events.has(event.id)) events.set(event.id, event);
     },
     async all() {
-      return [...events.values()].sort(byTime);
+      return [...events.values()].sort(byTimeThenId);
     },
   };
 }
-
-export const byTime = (a: HistoryEvent, b: HistoryEvent) => a.at.localeCompare(b.at);

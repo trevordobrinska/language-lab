@@ -1,5 +1,6 @@
-import type { HistoryEvent } from "../core";
-import { byTime, STORAGE_PREFIX, type HistoryLogStore } from "./historyLogStore";
+import { byTimeThenId, type HistoryEvent } from "../core";
+import type { HistoryLogStore } from "./historyLogStore";
+import { STORAGE_PREFIX } from "./storagePrefix";
 
 const DB_NAME = `${STORAGE_PREFIX}-history-log`;
 const DB_VERSION = 1;
@@ -36,7 +37,7 @@ export function indexedDbHistoryLog(): HistoryLogStore {
       const tx = (await db()).transaction(EVENTS, "readonly");
       const request = tx.objectStore(EVENTS).getAll();
       await done(tx);
-      return (request.result as HistoryEvent[]).sort(byTime);
+      return (request.result as HistoryEvent[]).sort(byTimeThenId);
     },
   };
 }

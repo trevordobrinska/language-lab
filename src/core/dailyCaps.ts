@@ -1,5 +1,6 @@
-import { bringsNewItem } from "./cards";
-import type { HistoryEvent } from "./historyLog";
+import { bringsNewItem, type Card } from "./cards";
+import { startOfDay } from "./days";
+import { firstSeen, type HistoryEvent } from "./historyLog";
 import type { CardSchedule } from "./scheduler";
 
 /**
@@ -23,26 +24,6 @@ export interface ReviewSettings {
 
 export const DEFAULT_REVIEW_SETTINGS: ReviewSettings = { newItemsPerDay: 15, reviewsPerDay: 150, utcOffsetMinutes: 0 };
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-
-/** When the learner's local day containing `now` began. */
-export function startOfDay(now: Date, utcOffsetMinutes: number): Date {
-  const offsetMs = utcOffsetMinutes * 60 * 1000;
-  const local = now.getTime() + offsetMs;
-  return new Date(local - (((local % DAY_MS) + DAY_MS) % DAY_MS) - offsetMs);
-}
-
-/** When each card first appeared in the History Log (introduced or first reviewed), by card ID. */
-function firstSeen(events: readonly HistoryEvent[]): Map<string, number> {
-  const first = new Map<string, number>();
-  for (const event of events) {
-    const at = new Date(event.at).getTime();
-    const known = first.get(event.cardId);
-    if (known === undefined || at < known) first.set(event.cardId, at);
-  }
-  return first;
-}
-
 /**
  * Orders due cards by FSRS recall probability, lowest (closest to being
  * forgotten) first. Ties keep their incoming order.
@@ -62,12 +43,17 @@ export interface DayContext {
  * Keeps only as many of `newCards` (already in introduction order) as are
  * left of today's new-Item cap. Every card first seen today that brings in
  * a new Item counts; Speaking Cards bring in none, so they're never capped.
+ * `packCards` (every card the pack can produce) tells logged card IDs apart.
  */
-export function capNewCards<T extends { id: string }>(newCards: readonly T[], { events, now, settings }: DayContext): T[] {
+export function capNewCards(newCards: readonly Card[], { events, now, settings }: DayContext, packCards: readonly Card[]): Card[] {
   const dayStart = startOfDay(now, settings.utcOffsetMinutes).getTime();
-  const introducedToday = [...firstSeen(events)].filter(([id, at]) => at >= dayStart && bringsNewItem(id)).length;
+  const byId = new Map(packCards.map((card) => [card.id, card]));
+  const introducedToday = [...firstSeen(events)].filter(([id, at]) => {
+    const card = byId.get(id);
+    return at >= dayStart && card !== undefined && bringsNewItem(card);
+  }).length;
   let left = settings.newItemsPerDay - introducedToday;
-  return newCards.filter((card) => !bringsNewItem(card.id) || left-- > 0);
+  return newCards.filter((card) => !bringsNewItem(card) || left-- > 0);
 }
 
 /** IDs of the cards graded today (the learner's local day). */

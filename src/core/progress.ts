@@ -1,6 +1,6 @@
 import { isLetterOrSound, letterCardId, listeningCardId } from "./cards";
-import type { ContentPack, Item } from "./contentPack";
-import type { CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
+import { mission1, type ContentPack, type Item } from "./contentPack";
+import { byTimeThenId, type CardReviewedEvent, type Grade, type HistoryEvent } from "./historyLog";
 import { buildQueue, cardSchedules, type QueueInput } from "./review";
 
 /** A count out of a total, e.g. 40 of the pack's 300 Items learned. */
@@ -27,7 +27,7 @@ export interface Progress {
    */
   readonly todaysReview: number;
   /**
-   * Mission 1 (`pack.missions[0]`): its word Items learned, out of every word
+   * Mission 1 (see `mission1`): its word Items learned, out of every word
    * Item tagged for it. Letters, sounds and grammar patterns aren't counted:
    * this is the Mission's vocabulary. Absent if the pack has no Missions.
    */
@@ -53,10 +53,10 @@ export function progress(input: QueueInput): Progress {
   const learnedCard = (cardId: string | undefined) => cardId !== undefined && latest.get(cardId) === "good";
   const introducedBy = introducingCards(pack);
   const learnedItem = (item: Item) => learnedCard(introducedBy.get(item.id));
-  const mission1 = pack.missions?.[0];
-  const missionWords = mission1 ? pack.items.filter((item) => item.kind === "word" && item.missions.includes(mission1.id)) : [];
+  const first = mission1(pack);
+  const missionWords = first ? pack.items.filter((item) => item.kind === "word" && item.missions.includes(first.id)) : [];
   return {
-    ...(mission1 && { mission: { id: mission1.id, name: mission1.name, ...tally(missionWords, learnedItem) } }),
+    ...(first && { mission: { id: first.id, name: first.name, ...tally(missionWords, learnedItem) } }),
     items: tally(pack.items, learnedItem),
     sentences: tally(pack.sentences, (s) => learnedCard(listeningCardId(s.id))),
     cardsDue: [...cardSchedules({ events, now }).values()].filter((card) => card.due.getTime() <= now.getTime()).length,
@@ -76,18 +76,13 @@ function introducingCards(pack: ContentPack): Map<string, string> {
   return cards;
 }
 
-/** Each reviewed card's latest grade. Ties in time break by event ID, as in `cardSchedules`. */
+/** Each reviewed card's latest grade. Latest in `byTimeThenId` order. */
 function latestGrades(events: readonly HistoryEvent[]): Map<string, Grade> {
   const latest = new Map<string, CardReviewedEvent>();
   for (const event of events) {
     if (event.type !== "card-reviewed") continue;
     const known = latest.get(event.cardId);
-    if (!known || isLater(event, known)) latest.set(event.cardId, event);
+    if (!known || byTimeThenId(event, known) > 0) latest.set(event.cardId, event);
   }
   return new Map([...latest].map(([cardId, event]) => [cardId, event.grade]));
-}
-
-function isLater(a: HistoryEvent, b: HistoryEvent): boolean {
-  const at = new Date(a.at).getTime() - new Date(b.at).getTime();
-  return at > 0 || (at === 0 && a.id > b.id);
 }
