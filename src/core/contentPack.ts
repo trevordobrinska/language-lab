@@ -80,7 +80,12 @@ export interface Sentence {
   readonly meaning: string;
   readonly romanisation?: string;
   readonly tone?: string;
-  /** IDs of every Item the sentence uses, including the one it introduces. */
+  /**
+   * IDs of every Item the sentence uses, including the one it introduces. For
+   * a script the pack teaches letter by letter, that includes the letter Item
+   * of every letter in `text`; the content check decomposes Hangul syllables
+   * and names any letter left out (a compound final such as ㅄ needs ㅂ and ㅅ).
+   */
   readonly itemIds: readonly string[];
   /** The one new Item this sentence brings in. */
   readonly introduces: string;

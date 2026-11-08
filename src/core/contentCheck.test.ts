@@ -120,6 +120,34 @@ describe("the content check", () => {
       ]);
     });
 
+    it("names a Sentence whose Hangul uses a letter its itemIds don't list", () => {
+      const pack = lettersThenSentences([sentence("s1", { text: "가.", itemIds: ["g", "ga"], introduces: "ga" })]);
+
+      expect(checkContentPack(pack, everyFileExists)).toEqual([
+        'Sentence "s1" uses letters its itemIds don\'t list: ㅏ ("a")',
+      ]);
+    });
+
+    it("asks for a compound final's component letters when the pack doesn't teach the compound itself", () => {
+      const hangul = [letter("ng", "ㅇ", "ng"), letter("eo", "ㅓ", "eo"), letter("b", "ㅂ", "b"), letter("s", "ㅅ", "s")];
+      const pack: ContentPack = {
+        ...withSentences(packOf(hangul), [sentence("s1", { text: "없", itemIds: ["ng", "eo", "b", "eops"], introduces: "eops" })]),
+        items: [...hangul, word("eops", "없", "not have")],
+      };
+
+      expect(checkContentPack(pack, everyFileExists)).toEqual([
+        'Sentence "s1" uses letters its itemIds don\'t list: ㅅ ("s")',
+      ]);
+    });
+
+    it("names a Sentence whose Hangul uses a letter no letter Item teaches", () => {
+      const pack = lettersThenSentences([sentence("s1", { text: "개", itemIds: ["g", "gae"], introduces: "gae" })]);
+
+      expect(checkContentPack(pack, everyFileExists)).toEqual([
+        'Sentence "s1" uses letters no letter Item teaches: ㅐ',
+      ]);
+    });
+
     it("names a Sentence that isn't in the introduction order", () => {
       const pack = { ...lettersThenSentences([]), sentences: [sentence("s1", { itemIds: ["gae"], introduces: "gae" })] };
 

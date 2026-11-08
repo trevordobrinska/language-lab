@@ -1,4 +1,5 @@
-import { AUDIO_ITEM_KINDS, type ContentPack } from "./contentPack";
+import { AUDIO_ITEM_KINDS, type ContentPack, type Sentence } from "./contentPack";
+import { hangulJamo, taughtLetters } from "./hangul";
 
 /**
  * The content check: finds content that must not reach the phone. Returns one
@@ -13,6 +14,8 @@ export function checkContentPack(pack: ContentPack, audioExists: (path: string) 
   const items = new Map(pack.items.map((item) => [item.id, item]));
 
   const sentences = new Map(pack.sentences.map((sentence) => [sentence.id, sentence]));
+  /** Letter text → the letter Item that teaches it, e.g. "ㄱ" → "hangul-g". */
+  const letterIds = new Map(pack.items.filter((item) => item.kind === "letter").map((item) => [item.text, item.id]));
 
   for (const id of pack.order) {
     if (!items.has(id) && !sentences.has(id)) {
@@ -47,6 +50,7 @@ export function checkContentPack(pack: ContentPack, audioExists: (path: string) 
     if (!items.has(sentence.introduces)) {
       problems.push(`Sentence "${sentence.id}" introduces Item "${sentence.introduces}", which is not defined`);
     }
+    problems.push(...unlistedLetters(sentence, letterIds));
   }
 
   // Walk the introduction order, tracking which Items the learner has met.
@@ -76,5 +80,38 @@ export function checkContentPack(pack: ContentPack, audioExists: (path: string) 
     if (!ordered.has(sentence.id)) problems.push(`Sentence "${sentence.id}" is not in the introduction order`);
   }
 
+  return problems;
+}
+
+/**
+ * The letter rule: a Sentence must list, in its `itemIds`, the letter Item for
+ * every Hangul letter its text contains, so it's only introduced once the
+ * learner can read it. Letters are found by decomposing each syllable; a
+ * compound the pack doesn't teach as its own letter (a final such as ㅄ)
+ * needs its component letters instead.
+ */
+function unlistedLetters(sentence: Sentence, letterIds: ReadonlyMap<string, string>): string[] {
+  const listed = new Set(sentence.itemIds);
+  const missing = new Map<string, string>();
+  const untaught = new Set<string>();
+  for (const jamo of hangulJamo(sentence.text)) {
+    const letters = taughtLetters(jamo, (letter) => letterIds.has(letter));
+    if (!letters) {
+      untaught.add(jamo);
+      continue;
+    }
+    for (const letter of letters) {
+      const id = letterIds.get(letter)!;
+      if (!listed.has(id)) missing.set(letter, id);
+    }
+  }
+  const problems: string[] = [];
+  if (missing.size > 0) {
+    const list = [...missing].map(([letter, id]) => `${letter} ("${id}")`).join(", ");
+    problems.push(`Sentence "${sentence.id}" uses letters its itemIds don't list: ${list}`);
+  }
+  if (untaught.size > 0) {
+    problems.push(`Sentence "${sentence.id}" uses letters no letter Item teaches: ${[...untaught].join(", ")}`);
+  }
   return problems;
 }
