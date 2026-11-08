@@ -110,6 +110,32 @@ describe("generatePackAudio", () => {
     expect(await audioFiles()).toEqual(["hangul-g.mp3", "s1.mp3", "s2.mp3", "sound-ga.mp3"]);
   });
 
+  it("speaks an Item's speech text instead of its written text when it has one", async () => {
+    await writePack({
+      ...basePack,
+      items: [
+        { ...item("hangul-g", "letter", "ㄱ", "audio/hangul-g.mp3"), speech: "기역. 가." },
+        item("hangul-n", "letter", "ㄴ", "audio/hangul-n.mp3"),
+      ],
+      sentences: [],
+    });
+
+    const tts = fakeTts();
+    await generatePackAudio({ packDir, tts, encoder: fakeEncoder });
+
+    expect(tts.batches).toEqual([["기역. 가.", "ㄴ"]]);
+    expect(await read("audio/hangul-g.mp3")).toBe("MP3:WAV:기역. 가.");
+  });
+
+  it("makes audio for syllable-block Items too", async () => {
+    await writePack({ ...basePack, items: [item("syllable-san", "syllable", "산", "audio/syllable-san.mp3")], sentences: [] });
+
+    const result = await generatePackAudio({ packDir, tts: fakeTts(), encoder: fakeEncoder });
+
+    expect(result.generated).toEqual(["audio/syllable-san.mp3"]);
+    expect(await read("audio/syllable-san.mp3")).toBe("MP3:WAV:산");
+  });
+
   it("replaces placeholder audio: points the pack at the mp3 and removes the old file", async () => {
     const placeholderPack = {
       ...basePack,

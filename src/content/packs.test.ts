@@ -9,7 +9,8 @@ describe("the Korean content pack", () => {
     expect(queue.length).toBeGreaterThanOrEqual(3);
     for (const card of queue) {
       expect(card.kind).toBe("letter");
-      expect(card.front.text).toMatch(/^\p{Script=Hangul}+$/u);
+      // Hangul only (sound-contrast cards list syllables separated by " · ").
+      expect(card.front.text).toMatch(/^\p{Script=Hangul}+( · \p{Script=Hangul}+)*$/u);
       expect(audioUrl(korean, card.front.audio!)).toBeTruthy();
       expect(card.back.text).not.toBe("");
     }

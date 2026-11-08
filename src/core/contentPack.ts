@@ -39,11 +39,15 @@ export interface Mission {
 
 /**
  * - `letter`: one letter of the script (a Hangul jamo, a kana).
+ * - `syllable`: letters combined into one written block (a Hangul syllable such as 산).
  * - `sound`: a sound contrast to hear (e.g. Korean plain/tense/aspirated).
  * - `word`: a word or fixed phrase.
  * - `grammar`: a grammar pattern; it can have a Grammar Note.
  */
-export type ItemKind = "letter" | "sound" | "word" | "grammar";
+export type ItemKind = "letter" | "syllable" | "sound" | "word" | "grammar";
+
+/** The Item kinds that must each have their own audio: the script and its sounds. */
+export const AUDIO_ITEM_KINDS: readonly ItemKind[] = ["letter", "syllable", "sound"];
 
 export interface Item {
   /** Stable and unique within the pack; it's part of Card IDs in the History Log. */
@@ -56,8 +60,14 @@ export interface Item {
   readonly romanisation?: string;
   /** Tone or pitch-accent marking, for languages that need it. */
   readonly tone?: string;
-  /** Audio file path, relative to the pack's folder. Letter and sound Items have one. */
+  /** Audio file path, relative to the pack's folder. Letter, syllable and sound Items have one. */
   readonly audio?: string;
+  /**
+   * What the generated audio says, when that differs from `text`. A bare
+   * letter such as ㄱ isn't spoken well on its own, so it says its name and
+   * an example syllable instead ("기역. 가.").
+   */
+  readonly speech?: string;
   /** IDs of the Missions this item serves, e.g. "market". */
   readonly missions: readonly string[];
 }
