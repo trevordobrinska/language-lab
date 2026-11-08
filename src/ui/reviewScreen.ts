@@ -7,6 +7,8 @@ export interface ReviewScreenDeps {
   readonly pack: ContentPack;
   readonly log: HistoryLogStore;
   readonly deviceId: string;
+  /** Called after each grade is saved (e.g. to schedule a background sync). */
+  readonly onGraded?: () => void;
 }
 
 /**
@@ -14,7 +16,7 @@ export interface ReviewScreenDeps {
  * Again / Good buttons. Each grade is saved to the History Log before the
  * next card shows, and the queue is rebuilt from the log each time.
  */
-export async function showReviewScreen({ root, pack, log, deviceId }: ReviewScreenDeps): Promise<void> {
+export async function showReviewScreen({ root, pack, log, deviceId, onGraded }: ReviewScreenDeps): Promise<void> {
   const next = async () => {
     const queue = buildQueue({ pack, events: await log.all(), now: new Date() });
     if (queue.length === 0) showDone(root);
@@ -48,6 +50,7 @@ export async function showReviewScreen({ root, pack, log, deviceId }: ReviewScre
   const grade = async (card: Card, grade: Grade) => {
     root.querySelectorAll("button").forEach((b) => (b.disabled = true));
     await log.add(gradeCard(card, grade, { now: new Date(), deviceId, eventId: crypto.randomUUID() }));
+    onGraded?.();
     await next();
   };
 

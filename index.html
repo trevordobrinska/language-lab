@@ -67,6 +67,37 @@
       .grade.good {
         background: #c4e6bf;
       }
+      #open-settings {
+        position: fixed;
+        top: calc(8px + env(safe-area-inset-top));
+        right: 8px;
+        font-size: 16px;
+        padding: 8px 12px;
+        border-width: 1px;
+      }
+      .settings-section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        text-align: left;
+      }
+      .settings-section label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .settings-section input {
+        font: inherit;
+        font-size: 18px;
+        padding: 10px;
+        border: 1px solid #888;
+        border-radius: 10px;
+      }
+      .hint,
+      .sync-status {
+        margin: 0;
+        opacity: 0.7;
+      }
       .done {
         margin-top: 40vh;
         font-size: 24px;
@@ -74,6 +105,7 @@
     </style>
   </head>
   <body>
+    <button id="open-settings" type="button">Settings</button>
     <main id="app"></main>
     <script type="module" src="/src/main.ts"></script>
   </body>
