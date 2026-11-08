@@ -1,6 +1,7 @@
 import { packCards, type Card } from "./cards";
 import type { ContentPack } from "./contentPack";
 import type { CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
+import { capNewCards, capReviews, DEFAULT_REVIEW_SETTINGS, mostAtRiskFirst, type ReviewSettings } from "./dailyCaps";
 import { newMaterial } from "./newMaterial";
 import { schedule, type CardSchedule, type PastReview } from "./scheduler";
 
@@ -11,6 +12,8 @@ export interface QueueInput {
   readonly events: readonly HistoryEvent[];
   /** The current time. The core never reads the clock itself. */
   readonly now: Date;
+  /** Daily caps and the learner's timezone (see `dailyCaps.ts`); missing fields use the defaults. */
+  readonly settings?: Partial<ReviewSettings>;
 }
 
 /**
@@ -21,13 +24,20 @@ export interface QueueInput {
 const LEARN_AHEAD_MS = 20 * 60 * 1000;
 
 /** Today's Review: the cards to show, in order. */
-export function buildQueue({ pack, events, now }: QueueInput): Card[] {
+export function buildQueue({ pack, events, now, settings }: QueueInput): Card[] {
+  const day = { events, now, settings: { ...DEFAULT_REVIEW_SETTINGS, ...settings } };
   const schedules = cardSchedules({ events, now });
   const cards = packCards(pack);
   const dueBy = (card: Card) => schedules.get(card.id)?.due.getTime() ?? now.getTime();
-  const newCards = newMaterial(pack, events);
+  const newCards = capNewCards(newMaterial(pack, events), day);
   const reviews = cards.filter((card) => schedules.has(card.id)).sort((a, b) => dueBy(a) - dueBy(b));
-  const dueReviews = reviews.filter((card) => dueBy(card) <= now.getTime());
+  const dueReviews = capReviews(
+    mostAtRiskFirst(
+      reviews.filter((card) => dueBy(card) <= now.getTime()),
+      schedules,
+    ),
+    day,
+  );
   const comingBack = reviews.filter(
     (card) => dueBy(card) > now.getTime() && dueBy(card) <= now.getTime() + LEARN_AHEAD_MS,
   );

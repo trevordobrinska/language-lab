@@ -1,3 +1,4 @@
+import { DEFAULT_REVIEW_SETTINGS } from "../core";
 import { loadSettings, syncTarget, updateSettings, type Settings } from "../storage/settings";
 
 export interface SettingsScreenDeps {
@@ -20,7 +21,45 @@ export interface SectionContext {
   readonly requestSync: () => void;
 }
 
-const SECTIONS: readonly SettingsSection[] = [syncSection];
+const SECTIONS: readonly SettingsSection[] = [dailyCapsSection, syncSection];
+
+function dailyCapsSection({ settings, save }: SectionContext): HTMLElement {
+  const newItems = numberInput(settings.newItemsPerDay ?? DEFAULT_REVIEW_SETTINGS.newItemsPerDay);
+  const reviews = numberInput(settings.reviewsPerDay ?? DEFAULT_REVIEW_SETTINGS.reviewsPerDay);
+  const status = el("p", "caps-status", "");
+
+  const saveCaps = () => {
+    const newItemsPerDay = Number(newItems.value);
+    const reviewsPerDay = Number(reviews.value);
+    if (![newItemsPerDay, reviewsPerDay].every((n) => Number.isInteger(n) && n >= 0)) {
+      status.textContent = "Use whole numbers, 0 or more.";
+      return;
+    }
+    save({ newItemsPerDay, reviewsPerDay });
+    status.textContent = "Saved. Your next Review uses these.";
+  };
+
+  return el("section", "settings-section", "", [
+    el("h2", "", "Daily caps"),
+    el(
+      "p",
+      "hint",
+      "The most new items and reviews in one day. Reviews over the cap wait for the next day, with the cards you're closest to forgetting first.",
+    ),
+    labelled("New items per day", newItems),
+    labelled("Reviews per day", reviews),
+    button("save", "Save caps", saveCaps),
+    status,
+  ]);
+}
+
+function numberInput(value: number): HTMLInputElement {
+  const node = input("number", "", String(value));
+  node.min = "0";
+  node.step = "1";
+  node.inputMode = "numeric";
+  return node;
+}
 
 /** The settings screen. Re-render it (call again) to refresh the last sync time. */
 export function showSettingsScreen({ root, requestSync, onBack }: SettingsScreenDeps): void {
