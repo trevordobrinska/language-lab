@@ -35,10 +35,23 @@ describe("the Korean content pack", () => {
       "listening:sentence-eoseo-oseyo",
       "listening:sentence-annyeonghaseyo-eoseo-oseyo",
     ]);
-    // Every Sentence is introduced, and 맛있어요 (restaurant only) waits until the market Sentences are in.
+    // Every Sentence is introduced. Restaurant-only Sentences wait until every market Sentence is in,
+    // and the restaurant ones then start with 맛있어요, the first in the authored order.
     expect(ids).toHaveLength(korean.sentences.length);
-    expect(ids.at(-1)).toBe("listening:sentence-masisseoyo");
+    const introduces = new Map(korean.sentences.map((s) => [`listening:${s.id}`, s.introduces]));
+    const forMarket = ids.map((id) => korean.items.find((item) => item.id === introduces.get(id))!.missions.includes("market"));
+    const firstRestaurantOnly = forMarket.indexOf(false);
+    expect(forMarket.slice(firstRestaurantOnly)).not.toContain(true);
+    expect(ids[firstRestaurantOnly]).toBe("listening:sentence-masisseoyo");
     for (const card of queue) expect(audioUrl(korean, card.front.audio!)).toBeTruthy();
+  });
+
+  it("holds about 300 word Items, about half of them for each Mission", () => {
+    const words = korean.items.filter((item) => item.kind === "word");
+    const restaurantOnly = words.filter((item) => item.missions.includes("restaurant") && !item.missions.includes("market"));
+    expect(words.length).toBeGreaterThanOrEqual(290);
+    expect(words.length).toBeLessThanOrEqual(310);
+    expect(restaurantOnly.length).toBeGreaterThanOrEqual(140);
   });
 
   it("gives every grammar pattern a Grammar Note, and every Sentence English and romanisation", () => {
