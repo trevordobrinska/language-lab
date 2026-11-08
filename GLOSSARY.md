@@ -21,7 +21,7 @@ CEFR B1 in speaking and listening for a Target Language. Reading and writing are
 _Avoid_: Fluent, proficiency, done
 
 **Mission**:
-A concrete real-world conversation the learner wants to manage in a Target Language, such as chatting with the shop owner at a Korean market.
+A concrete real-world situation, spoken or listening only, that the learner wants to handle in a Target Language. Examples: chatting with the shop owner at a Korean market, following a Korean cooking video without subtitles.
 _Avoid_: Goal, scenario, quest
 
 **Checkpoint**:
@@ -33,6 +33,22 @@ _Avoid_: Exam, test, assessment
 **Review**:
 Spaced recall of sentences already met. The learner recalls aloud, reveals the answer and grades themselves. It happens on the phone, anywhere.
 _Avoid_: Flashcards, SRS, drill
+
+**Listening Card**:
+A Review item where the learner hears a Target Language sentence and recalls its meaning.
+_Avoid_: Recognition card, forward card
+
+**Speaking Card**:
+A Review item where the learner sees the English meaning and says the Target Language sentence aloud. It unlocks only after its Listening Card has been passed a few times.
+_Avoid_: Production card, reverse card
+
+**Grammar Note**:
+A short explanation of a grammar pattern (two or three sentences and an example), shown the first time the pattern appears.
+_Avoid_: Grammar lesson, chapter
+
+**History Log**:
+The add-only record of every review and session the learner has done, from which all progress and scheduling are calculated.
+_Avoid_: Progress, save data, stats
 
 **Study Session**:
 Focused time at the PC for meeting new material through listening and reading at the learner's level, followed by Conversation Practice.
