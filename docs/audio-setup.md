@@ -49,7 +49,7 @@ Run these from the repo root in PowerShell.
    npm run audio
    ```
    Run it again: it should say "All audio already exists."
-8. **(you)** Listen-check a sample of the new files (spec story 51). In particular, check the **letter** Items. MeloTTS is given the bare jamo (e.g. `ㄱ`), and a lone consonant may come out as its name, as silence, or garbled. If it does, tell a Claude Code session, which can change what's spoken for letters (for example, a syllable such as `가`). Then delete the bad mp3 and rerun.
+8. **(you)** Listen-check a sample of the new files (spec story 51). In particular, check the **letter**, **syllable** and **sound** Items. An Item's optional `speech` field is what MeloTTS says instead of its `text`: letters say their name and an example syllable (`ㄱ` says "기역. 가."), vowels say the vowel (`ㅏ` says "아"), and sound contrasts say each syllable in turn ("가. 까. 카."). If a clip is garbled, change that Item's `speech` in `pack.json` (or ask a Claude Code session to), then delete the bad mp3 and rerun.
 9. Run `npm test`, then commit `content/` (the new mp3s, the updated `pack.json`, and the deleted placeholder `.wav`s).
 
 ## Overrides

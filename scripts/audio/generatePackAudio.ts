@@ -1,7 +1,7 @@
 /**
  * The incremental audio generator for one content pack (ticket 03).
  *
- * Every Sentence and every letter or sound Item gets one compressed audio
+ * Every Sentence and every letter, syllable or sound Item gets one compressed audio
  * file, `audio/<id>.mp3`, relative to the pack folder. Files that already
  * exist are skipped. The text-to-speech engine and the mp3 encoder are passed
  * in, so this logic is tested with fakes and the real MeloTTS and ffmpeg
@@ -10,7 +10,7 @@
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { ContentPack } from "../../src/core/contentPack.ts";
+import { AUDIO_ITEM_KINDS, type ContentPack } from "../../src/core/contentPack.ts";
 
 export interface TtsJob {
   /** What to say, in the Target Language. */
@@ -44,13 +44,13 @@ export function audioPathFor(id: string): string {
   return `audio/${id}.mp3`;
 }
 
-/** Every audio file the pack needs: one per Sentence and per letter or sound Item. */
+/** Every audio file the pack needs: one per Sentence and per letter, syllable or sound Item. */
 export function audioTargets(pack: ContentPack): AudioTarget[] {
-  const entries = [
-    ...pack.items.filter((item) => item.kind === "letter" || item.kind === "sound"),
-    ...pack.sentences,
-  ];
-  return entries.map((e) => ({ id: e.id, text: e.text, path: audioPathFor(e.id), current: e.audio }));
+  const items = pack.items
+    .filter((item) => AUDIO_ITEM_KINDS.includes(item.kind))
+    .map((item) => ({ id: item.id, text: item.speech ?? item.text, path: audioPathFor(item.id), current: item.audio }));
+  const sentences = pack.sentences.map((s) => ({ id: s.id, text: s.text, path: audioPathFor(s.id), current: s.audio }));
+  return [...items, ...sentences];
 }
 
 /**

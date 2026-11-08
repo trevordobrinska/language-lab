@@ -59,11 +59,16 @@ describe("the content check", () => {
     ]);
   });
 
-  it("names a letter or sound Item that has no audio at all", () => {
-    const pack = packOf([letter("g", "ㄱ", "g", { audio: undefined }), { ...letter("tense", "ㄲ", "kk"), kind: "sound", audio: undefined }]);
+  it("names a letter, syllable or sound Item that has no audio at all", () => {
+    const pack = packOf([
+      letter("g", "ㄱ", "g", { audio: undefined }),
+      letter("san", "산", "san", { kind: "syllable", audio: undefined }),
+      { ...letter("tense", "ㄲ", "kk"), kind: "sound", audio: undefined },
+    ]);
 
     expect(checkContentPack(pack, everyFileExists)).toEqual([
       'Item "g" is a letter Item with no audio',
+      'Item "san" is a syllable Item with no audio',
       'Item "tense" is a sound Item with no audio',
     ]);
   });

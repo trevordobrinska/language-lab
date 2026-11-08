@@ -1,4 +1,4 @@
-import type { ContentPack } from "./contentPack";
+import { AUDIO_ITEM_KINDS, type ContentPack } from "./contentPack";
 
 /**
  * The content check: finds content that must not reach the phone. Returns one
@@ -31,7 +31,7 @@ export function checkContentPack(pack: ContentPack, audioExists: (path: string) 
 
   for (const item of pack.items) {
     if (item.audio === undefined) {
-      if (item.kind === "letter" || item.kind === "sound") problems.push(`Item "${item.id}" is a ${item.kind} Item with no audio`);
+      if (AUDIO_ITEM_KINDS.includes(item.kind)) problems.push(`Item "${item.id}" is a ${item.kind} Item with no audio`);
     } else if (!audioExists(item.audio)) {
       problems.push(`Item "${item.id}" has audio "${item.audio}", but the file is missing`);
     }
