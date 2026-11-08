@@ -7,3 +7,4 @@ export { buildQueue, cardSchedules, gradeCard, type Card, type GradeContext, typ
 export type { CardSchedule } from "./scheduler";
 export type { ContentPack, GrammarNote, Item, ItemKind, Sentence } from "./contentPack";
 export type { CardIntroducedEvent, CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
+export { checkContentPack } from "./contentCheck";
