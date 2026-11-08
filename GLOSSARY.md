@@ -50,6 +50,10 @@ _Avoid_: Grammar lesson, chapter
 The add-only record of every review and session the learner has done, from which all progress and scheduling are calculated.
 _Avoid_: Progress, save data, stats
 
+**Learned**:
+An Item or Sentence whose introducing card (a letter card, or the Listening Card of the Sentence that introduces it) was graded Good the last time it was reviewed. Graded Again, it stops counting until passed again. Progress counts are built on this.
+_Avoid_: Known, mastered, completed
+
 **Study Session**:
 Focused time at the PC for meeting new material through listening and reading at the learner's level, followed by Conversation Practice.
 _Avoid_: Lesson, class

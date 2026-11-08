@@ -15,6 +15,8 @@ export interface Settings {
   /** Daily caps (spec "Missed days"). Unset means the core's defaults (15 and 150). */
   readonly newItemsPerDay?: number;
   readonly reviewsPerDay?: number;
+  /** Set once the first-run "How Review works" screen has been dismissed, so it shows only once. */
+  readonly seenHowReviewWorks?: boolean;
 }
 
 const KEY = `${STORAGE_PREFIX}:settings`;

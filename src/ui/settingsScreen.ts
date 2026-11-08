@@ -6,6 +6,8 @@ export interface SettingsScreenDeps {
   /** Ask for a background sync now (settings just changed, or the learner tapped Sync). */
   readonly requestSync: () => void;
   readonly onBack: () => void;
+  /** Reopen the first-run "How Review works" screen. */
+  readonly openHowReviewWorks: () => void;
 }
 
 /**
@@ -19,9 +21,18 @@ export interface SectionContext {
   readonly settings: Settings;
   readonly save: (changes: Partial<Settings>) => void;
   readonly requestSync: () => void;
+  readonly openHowReviewWorks: () => void;
 }
 
-const SECTIONS: readonly SettingsSection[] = [dailyCapsSection, syncSection];
+const SECTIONS: readonly SettingsSection[] = [dailyCapsSection, syncSection, howReviewWorksSection];
+
+function howReviewWorksSection({ openHowReviewWorks }: SectionContext): HTMLElement {
+  return el("section", "settings-section", "", [
+    el("h2", "", "How Review works"),
+    el("p", "hint", "The routine (recall, reveal, grade honestly) and the research behind each Method."),
+    button("save", "How Review works", openHowReviewWorks),
+  ]);
+}
 
 function dailyCapsSection({ settings, save }: SectionContext): HTMLElement {
   const newItems = numberInput(settings.newItemsPerDay ?? DEFAULT_REVIEW_SETTINGS.newItemsPerDay);
@@ -62,11 +73,12 @@ function numberInput(value: number): HTMLInputElement {
 }
 
 /** The settings screen. Re-render it (call again) to refresh the last sync time. */
-export function showSettingsScreen({ root, requestSync, onBack }: SettingsScreenDeps): void {
+export function showSettingsScreen({ root, requestSync, onBack, openHowReviewWorks }: SettingsScreenDeps): void {
   const context: SectionContext = {
     settings: loadSettings(),
     save: (changes) => void updateSettings(changes),
     requestSync,
+    openHowReviewWorks,
   };
   root.replaceChildren(
     el("h1", "settings-title", "Settings"),
