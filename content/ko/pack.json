@@ -64,9 +64,26 @@
     { "id": "sound-d-tt-t", "kind": "sound", "text": "다 · 따 · 타", "meaning": "da · tta · ta: plain ㄷ (relaxed, a little air) · tense ㄸ (tight, no air) · aspirated ㅌ (a strong puff of air)", "romanisation": "da · tta · ta", "speech": "다. 따. 타.", "audio": "audio/sound-d-tt-t.wav", "missions": [] },
     { "id": "sound-b-pp-p", "kind": "sound", "text": "바 · 빠 · 파", "meaning": "ba · ppa · pa: plain ㅂ (relaxed, a little air) · tense ㅃ (tight, no air) · aspirated ㅍ (a strong puff of air)", "romanisation": "ba · ppa · pa", "speech": "바. 빠. 파.", "audio": "audio/sound-b-pp-p.wav", "missions": [] },
     { "id": "sound-j-jj-ch", "kind": "sound", "text": "자 · 짜 · 차", "meaning": "ja · jja · cha: plain ㅈ (relaxed, a little air) · tense ㅉ (tight, no air) · aspirated ㅊ (a strong puff of air)", "romanisation": "ja · jja · cha", "speech": "자. 짜. 차.", "audio": "audio/sound-j-jj-ch.wav", "missions": [] },
-    { "id": "sound-s-ss", "kind": "sound", "text": "사 · 싸", "meaning": "sa · ssa: plain ㅅ (soft, breathy) · tense ㅆ (sharp and hissing, no breathiness)", "romanisation": "sa · ssa", "speech": "사. 싸.", "audio": "audio/sound-s-ss.wav", "missions": [] }
+    { "id": "sound-s-ss", "kind": "sound", "text": "사 · 싸", "meaning": "sa · ssa: plain ㅅ (soft, breathy) · tense ㅆ (sharp and hissing, no breathiness)", "romanisation": "sa · ssa", "speech": "사. 싸.", "audio": "audio/sound-s-ss.wav", "missions": [] },
+    { "id": "word-ne", "kind": "word", "text": "네", "meaning": "yes", "romanisation": "ne", "missions": ["market", "restaurant"] },
+    { "id": "word-annyeonghaseyo", "kind": "word", "text": "안녕하세요", "meaning": "hello (polite)", "romanisation": "annyeonghaseyo", "missions": ["market", "restaurant"] },
+    { "id": "word-masisseoyo", "kind": "word", "text": "맛있어요", "meaning": "it's delicious", "romanisation": "masisseoyo", "missions": ["restaurant"] },
+    { "id": "word-eolmayeyo", "kind": "word", "text": "얼마예요", "meaning": "how much is it?", "romanisation": "eolmayeyo", "missions": ["market"] },
+    { "id": "word-igeo", "kind": "word", "text": "이거", "meaning": "this (thing)", "romanisation": "igeo", "missions": ["market"] },
+    { "id": "word-gamsahamnida", "kind": "word", "text": "감사합니다", "meaning": "thank you (formal)", "romanisation": "gamsahamnida", "missions": ["market", "restaurant"] }
   ],
-  "sentences": [],
+  "missions": [
+    { "id": "market", "name": "Chat with the market shop owner" },
+    { "id": "restaurant", "name": "Order and talk about the food at a Korean restaurant" }
+  ],
+  "sentences": [
+    { "id": "sentence-ne", "text": "네.", "meaning": "Yes.", "romanisation": "Ne.", "itemIds": ["hangul-n", "hangul-e", "word-ne"], "introduces": "word-ne", "audio": "audio/sentence-ne.wav" },
+    { "id": "sentence-annyeonghaseyo", "text": "안녕하세요.", "meaning": "Hello.", "romanisation": "Annyeonghaseyo.", "itemIds": ["hangul-ng", "hangul-a", "hangul-n", "hangul-yeo", "hangul-h", "hangul-s", "hangul-e", "hangul-yo", "word-annyeonghaseyo"], "introduces": "word-annyeonghaseyo", "audio": "audio/sentence-annyeonghaseyo.wav" },
+    { "id": "sentence-masisseoyo", "text": "맛있어요.", "meaning": "It's delicious.", "romanisation": "Masisseoyo.", "itemIds": ["hangul-m", "hangul-a", "hangul-s", "hangul-ng", "hangul-i", "hangul-ss", "hangul-eo", "hangul-yo", "word-masisseoyo"], "introduces": "word-masisseoyo", "audio": "audio/sentence-masisseoyo.wav" },
+    { "id": "sentence-eolmayeyo", "text": "얼마예요?", "meaning": "How much is it?", "romanisation": "Eolmayeyo?", "itemIds": ["hangul-ng", "hangul-eo", "hangul-r", "hangul-m", "hangul-a", "hangul-ye", "hangul-yo", "word-eolmayeyo"], "introduces": "word-eolmayeyo", "audio": "audio/sentence-eolmayeyo.wav" },
+    { "id": "sentence-igeo-eolmayeyo", "text": "이거 얼마예요?", "meaning": "How much is this?", "romanisation": "Igeo eolmayeyo?", "itemIds": ["hangul-ng", "hangul-i", "hangul-g", "hangul-eo", "hangul-r", "hangul-m", "hangul-a", "hangul-ye", "hangul-yo", "word-eolmayeyo", "word-igeo"], "introduces": "word-igeo", "audio": "audio/sentence-igeo-eolmayeyo.wav" },
+    { "id": "sentence-gamsahamnida", "text": "감사합니다.", "meaning": "Thank you.", "romanisation": "Gamsahamnida.", "itemIds": ["hangul-g", "hangul-a", "hangul-m", "hangul-s", "hangul-h", "hangul-b", "hangul-n", "hangul-i", "hangul-d", "word-gamsahamnida"], "introduces": "word-gamsahamnida", "audio": "audio/sentence-gamsahamnida.wav" }
+  ],
   "grammarNotes": [],
   "order": [
     "hangul-a", "hangul-eo", "hangul-o", "hangul-u", "hangul-eu", "hangul-i",
@@ -78,6 +95,7 @@
     "sound-g-kk-k", "sound-d-tt-t", "sound-b-pp-p", "sound-j-jj-ch", "sound-s-ss",
     "hangul-ae", "hangul-e", "hangul-yae", "hangul-ye", "hangul-wa", "hangul-wae", "hangul-oe", "hangul-wo", "hangul-we", "hangul-wi", "hangul-ui",
     "syllable-wa", "syllable-gwa",
-    "syllable-san", "syllable-mul", "syllable-bap", "syllable-gang", "syllable-guk", "syllable-ot", "syllable-kkot"
+    "syllable-san", "syllable-mul", "syllable-bap", "syllable-gang", "syllable-guk", "syllable-ot", "syllable-kkot",
+    "sentence-ne", "sentence-annyeonghaseyo", "sentence-masisseoyo", "sentence-eolmayeyo", "sentence-igeo-eolmayeyo", "sentence-gamsahamnida"
   ]
 }

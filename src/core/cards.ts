@@ -1,4 +1,4 @@
-import type { ContentPack, Item, Sentence } from "./contentPack";
+import { AUDIO_ITEM_KINDS, type ContentPack, type Item, type Sentence } from "./contentPack";
 
 /**
  * - `letter`: hear and see a letter or sound, recall what it is.
@@ -46,8 +46,8 @@ export const speakingCardId = (sentenceId: string) => `speaking:${sentenceId}`;
  */
 export const bringsNewItem = (cardId: string) => !cardId.startsWith("speaking:");
 
-/** Items whose cards are letter cards: the script and its sounds, met before any Sentence. */
-export const isLetterOrSound = (item: Item) => item.kind === "letter" || item.kind === "sound";
+/** Items whose cards are letter cards: the script (letters, syllable blocks) and its sounds, met before any Sentence. */
+export const isLetterOrSound = (item: Item) => AUDIO_ITEM_KINDS.includes(item.kind);
 
 export function letterCard(item: Item): Card {
   return {
