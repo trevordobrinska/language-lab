@@ -51,7 +51,7 @@ The add-only record of every review and session the learner has done, from which
 _Avoid_: Progress, save data, stats
 
 **Learned**:
-An Item or Sentence whose introducing card (a letter card, or the Listening Card of the Sentence that introduces it) was graded Good the last time it was reviewed. Graded Again, it stops counting until passed again. Progress counts are built on this.
+An Item or Sentence whose introducing card (a letter card, or the Listening Card of the Sentence that introduces it) was graded Good the last time it was reviewed. Graded Again, it stops counting until passed again. Progress counts are built on this. A new Sentence uses a looser bar to decide whether its other Items are familiar enough: a word or grammar Item counts once its introducing Listening Card has been graded Good at least once (a later Again doesn't undo it), and a letter or sound counts once its letter card has been reviewed at all.
 _Avoid_: Known, mastered, completed
 
 **Study Session**:

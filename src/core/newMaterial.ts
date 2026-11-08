@@ -20,7 +20,7 @@ import type { HistoryEvent } from "./historyLog";
  *   days (the learner's local days). They bring in no new Item.
  * - Then letter and sound Items, in the authored order.
  * - A Sentence is eligible only when every letter or sound Item it lists has
- *   been met and exactly one of its other Items is new to the learner.
+ *   been met and all but one of its other Items are known (see `knownItems`).
  * - Among eligible Sentences, one whose new Item serves Mission 1 (the
  *   pack's first Mission) goes first; otherwise the authored order decides.
  *
@@ -32,7 +32,7 @@ export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[], 
   const seen = new Set(events.map((event) => event.cardId));
   const items = new Map(pack.items.map((item) => [item.id, item]));
   const sentences = pack.order.flatMap((id) => pack.sentences.filter((s) => s.id === id));
-  const met = metItems(pack, seen);
+  const known = knownItems(pack, events, seen);
   const goodDays = goodDaysByCard(events, utcOffsetMinutes);
   const cards: Card[] = [];
 
@@ -45,7 +45,7 @@ export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[], 
     const item = items.get(id);
     if (item && isLetterOrSound(item) && !seen.has(letterCardId(id))) {
       cards.push(letterCard(item));
-      met.add(id);
+      known.add(id);
     }
   }
 
@@ -54,11 +54,12 @@ export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[], 
 
   let waiting = sentences.filter((s) => !seen.has(listeningCardId(s.id)));
   for (;;) {
-    const eligible = waiting.filter((s) => newItemIn(s, met, items) !== undefined);
-    const next = eligible.find((s) => servesMission1(newItemIn(s, met, items)!)) ?? eligible[0];
+    const eligible = waiting.filter((s) => newItemIn(s, known, items) !== undefined);
+    const next = eligible.find((s) => servesMission1(newItemIn(s, known, items)!)) ?? eligible[0];
     if (!next) break;
     cards.push(listeningCard(next, items.get(next.introduces)));
-    for (const id of next.itemIds) met.add(id);
+    // Looking ahead as if the learner passes it; if they grade it Again, the rebuilt queue drops what built on it.
+    known.add(newItemIn(next, known, items)!);
     waiting = waiting.filter((s) => s !== next);
   }
   return cards;
@@ -79,12 +80,20 @@ function goodDaysByCard(events: readonly HistoryEvent[], utcOffsetMinutes: numbe
   return days;
 }
 
-/** Items the learner has met: letters whose card they've seen, and every Item in a Sentence they've heard. */
-function metItems(pack: ContentPack, seen: ReadonlySet<string>): Set<string> {
-  const met = new Set<string>();
-  for (const item of pack.items) if (isLetterOrSound(item) && seen.has(letterCardId(item.id))) met.add(item.id);
-  for (const s of pack.sentences) if (seen.has(listeningCardId(s.id))) for (const id of s.itemIds) met.add(id);
-  return met;
+/**
+ * Items the learner knows well enough to build on:
+ * - a letter or sound once its letter card has been seen (reviewed at all),
+ *   so reading isn't held up by one shaky letter;
+ * - any other Item once the Listening Card of a Sentence that introduces it
+ *   has been graded Good at least once. Heard but only ever graded Again
+ *   doesn't count. (Looser than Learned: a later Again doesn't undo it.)
+ */
+function knownItems(pack: ContentPack, events: readonly HistoryEvent[], seen: ReadonlySet<string>): Set<string> {
+  const passed = new Set(events.filter((event) => event.type === "card-reviewed" && event.grade === "good").map((event) => event.cardId));
+  const known = new Set<string>();
+  for (const item of pack.items) if (isLetterOrSound(item) && seen.has(letterCardId(item.id))) known.add(item.id);
+  for (const s of pack.sentences) if (passed.has(listeningCardId(s.id))) known.add(s.introduces);
+  return known;
 }
 
 /** The one new Item a Sentence would bring in, or undefined if it isn't eligible (unmet letters, or not exactly one new Item). */

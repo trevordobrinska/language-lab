@@ -127,6 +127,17 @@ describe("introducing Sentences", () => {
     expect(ids(queue)).toContain("listening:s-ne-aniyo");
   });
 
+  it("doesn't count an Item as known until the Sentence introducing it has been graded Good", () => {
+    const sAniyo = sentence("s-aniyo", "아니요.", "No.", ["ko-ng", "ko-a", "ko-n", "ko-i", "ko-yo", "w-aniyo"]);
+    const sNeAniyo = sentence("s-ne-aniyo", "네, 아니요.", "Yes, no.", [...letters.map((l) => l.id), "w-aniyo", "w-ne"]);
+    const pack = packWith([...letters, ne, aniyo], [sAniyo, sNeAniyo]);
+    const failed = [...lettersMet(START), reviewed("listening:s-aniyo", "again", START)];
+    const passedOnce = [...failed, reviewed("listening:s-aniyo", "good", later(START, 0, 0.5)), reviewed("listening:s-aniyo", "again", later(START, 3))];
+
+    expect(ids(buildQueue({ pack, events: failed, now: later(START, 0, 1) }))).not.toContain("listening:s-ne-aniyo");
+    expect(ids(buildQueue({ pack, events: passedOnce, now: later(START, 3, 1) }))).toContain("listening:s-ne-aniyo");
+  });
+
   it("introduces an eligible Mission 1 Sentence before an eligible Sentence that isn't tagged for a Mission", () => {
     const eolma = word("w-eolma", "얼마", "how much", { missions: ["market"] });
     const sAniyo = sentence("s-aniyo", "아니요.", "No.", ["ko-ng", "ko-a", "ko-n", "ko-i", "ko-yo", "w-aniyo"]);
