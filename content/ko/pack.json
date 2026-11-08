@@ -1,0 +1,15 @@
+{
+  "language": "ko",
+  "name": "Korean",
+  "script": "Hangul",
+  "items": [
+    { "id": "hangul-g", "kind": "letter", "text": "ㄱ", "meaning": "g / k (giyeok)", "romanisation": "g", "audio": "audio/hangul-g.wav", "missions": [] },
+    { "id": "hangul-n", "kind": "letter", "text": "ㄴ", "meaning": "n (nieun)", "romanisation": "n", "audio": "audio/hangul-n.wav", "missions": [] },
+    { "id": "hangul-m", "kind": "letter", "text": "ㅁ", "meaning": "m (mieum)", "romanisation": "m", "audio": "audio/hangul-m.wav", "missions": [] },
+    { "id": "hangul-a", "kind": "letter", "text": "ㅏ", "meaning": "a, as in \"father\"", "romanisation": "a", "audio": "audio/hangul-a.wav", "missions": [] },
+    { "id": "hangul-o", "kind": "letter", "text": "ㅗ", "meaning": "o, as in \"go\" (short)", "romanisation": "o", "audio": "audio/hangul-o.wav", "missions": [] }
+  ],
+  "sentences": [],
+  "grammarNotes": [],
+  "order": ["hangul-g", "hangul-n", "hangul-m", "hangul-a", "hangul-o"]
+}
