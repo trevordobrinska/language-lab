@@ -1,7 +1,7 @@
 import { packCards, type Card } from "./cards";
 import type { ContentPack } from "./contentPack";
 import type { CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
-import { capNewCards, capReviews, DEFAULT_REVIEW_SETTINGS, mostAtRiskFirst, type ReviewSettings } from "./dailyCaps";
+import { capNewCards, capReviews, DEFAULT_REVIEW_SETTINGS, mostAtRiskFirst, reviewedToday, type ReviewSettings } from "./dailyCaps";
 import { withGrammarNotes } from "./grammarNotes";
 import { newMaterial } from "./newMaterial";
 import { applyRomanisationWeek, inRomanisationWeek } from "./romanisation";
@@ -21,11 +21,17 @@ export interface QueueInput {
 /**
  * How far ahead a failed card still counts as part of today's Review. FSRS
  * brings a failed card back after a 10-minute step; it waits at the end of
- * the queue until then, so the Review never ends before it comes back.
+ * the queue until then, so the Review never ends before it comes back. Only
+ * cards already graded today wait like this: a card from an earlier day that
+ * falls due soon waits for its own time (and the review cap) instead.
  */
 const LEARN_AHEAD_MS = 20 * 60 * 1000;
 
-/** Today's Review: the cards to show, in order. */
+/**
+ * Today's Review: the cards to show, in order. Cards failed today and not
+ * yet back from their 10-minute step come last, marked `notDueUntil`; when
+ * one of those is first, nothing is due right now.
+ */
 export function buildQueue({ pack, events, now, settings }: QueueInput): Card[] {
   const day = { events, now, settings: { ...DEFAULT_REVIEW_SETTINGS, ...settings } };
   const schedules = cardSchedules({ events, now });
@@ -40,9 +46,10 @@ export function buildQueue({ pack, events, now, settings }: QueueInput): Card[] 
     ),
     day,
   );
-  const comingBack = reviews.filter(
-    (card) => dueBy(card) > now.getTime() && dueBy(card) <= now.getTime() + LEARN_AHEAD_MS,
-  );
+  const today = reviewedToday(day);
+  const comingBack = reviews
+    .filter((card) => today.has(card.id) && dueBy(card) > now.getTime() && dueBy(card) <= now.getTime() + LEARN_AHEAD_MS)
+    .map((card) => ({ ...card, notDueUntil: new Date(dueBy(card)) }));
   const queue = [...interleave(dueReviews, newCards), ...comingBack];
   const romanised = applyRomanisationWeek(queue, inRomanisationWeek(events, now, day.settings.utcOffsetMinutes));
   return withGrammarNotes(romanised, pack, events);

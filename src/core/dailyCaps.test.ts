@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildQueue, type Card, type ContentPack, type HistoryEvent } from "./index";
+import { buildQueue, cardSchedules, type Card, type ContentPack, type HistoryEvent } from "./index";
 import { later, letter, packOf, reviewed } from "./testing";
 
 const START = new Date("2026-11-07T08:00:00Z");
@@ -100,6 +100,16 @@ describe("the daily review cap", () => {
     const afterStep = buildQueue({ pack, events, now: later(backOn, 0, 0.5), settings: capOne });
 
     expect(afterStep.map((card) => card.id)).toEqual(["letter:l0"]);
+  });
+
+  it("doesn't pull in a card from an earlier day just because it falls due in a few minutes", () => {
+    const events = [reviewed("letter:l0", "good", START)];
+    const due = cardSchedules({ events, now: START }).get("letter:l0")!.due;
+    const fewMinutesBefore = new Date(due.getTime() - 5 * 60_000);
+
+    const queue = buildQueue({ pack, events, now: fewMinutesBefore, settings: { reviewsPerDay: 0, newItemsPerDay: 0 } });
+
+    expect(queue).toEqual([]);
   });
 
   it("defaults to 150 reviews a day", () => {

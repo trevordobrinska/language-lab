@@ -24,6 +24,7 @@ export async function showReviewScreen({ root, pack, log, deviceId, onGraded }: 
     // Settings are read each time, so changed caps apply to the very next queue.
     const queue = buildQueue({ pack, events: await log.all(), now, settings: reviewSettings(loadSettings(), now) });
     if (queue.length === 0) showDone(root);
+    else if (queue[0].notDueUntil && queue[0].notDueUntil > now) showWaiting(root, queue[0].notDueUntil, next);
     else showCard(queue[0], queue.length);
   };
 
@@ -115,6 +116,26 @@ function highlighted(text: string, part: string | undefined): Node[] {
     el("mark", "", part),
     document.createTextNode(text.slice(at + part.length)),
   ];
+}
+
+/**
+ * Only cards in their 10-minute step are left: a calm pause until the next
+ * one is due, then the Review carries on by itself. If the learner leaves
+ * the screen meanwhile, the pause just ends quietly.
+ */
+function showWaiting(root: HTMLElement, until: Date, carryOn: () => Promise<void>) {
+  const countdown = el("p", "waiting-time", "");
+  const view = el("div", "waiting", "", [countdown, el("p", "hint", "A card you're relearning comes back then. Nothing else is due.")]);
+  root.replaceChildren(view);
+  const tick = () => {
+    if (!view.isConnected) return;
+    const ms = until.getTime() - Date.now();
+    if (ms <= 0) return void carryOn();
+    const minutes = Math.ceil(ms / 60_000);
+    countdown.textContent = `Next card in ${minutes} min`;
+    setTimeout(tick, Math.min(ms, 15_000));
+  };
+  tick();
 }
 
 function showDone(root: HTMLElement) {

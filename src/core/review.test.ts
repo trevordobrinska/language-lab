@@ -50,6 +50,18 @@ describe("grading a card", () => {
     expect(queue.map((card) => card.front.text)).toContain("ㄱ");
   });
 
+  it("a card graded Again waits for its 10-minute step, marked with when it comes back", () => {
+    const onlyCard = packOf([giyeok]);
+    const [card] = buildQueue({ pack: onlyCard, events: [], now: START });
+    const events = [gradeCard(card, "again", { now: START, deviceId: "pc", eventId: "e1" })];
+
+    const waiting = buildQueue({ pack: onlyCard, events, now: new Date(START.getTime() + 60_000) });
+    const due = buildQueue({ pack: onlyCard, events, now: new Date(START.getTime() + 10 * 60_000) });
+
+    expect(waiting.map((c) => [c.id, c.notDueUntil])).toEqual([[card.id, new Date("2026-11-07T08:10:00Z")]]);
+    expect(due.map((c) => [c.id, c.notDueUntil])).toEqual([[card.id, undefined]]);
+  });
+
   it("a card graded Good comes back on a later day", () => {
     const [first] = buildQueue({ pack, events: [], now: START });
     const events = [gradeCard(first, "good", { now: START, deviceId: "pc", eventId: "e1" })];

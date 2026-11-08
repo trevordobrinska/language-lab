@@ -40,6 +40,12 @@ export interface Card {
   readonly grammarNotes?: readonly CardGrammarNote[];
   /** The Grammar Note to show before this card: set only on the pattern's first appearance (see `grammarNotes.ts`). */
   readonly noteBeforeCard?: CardGrammarNote;
+  /**
+   * Set only on a card failed earlier today that is still in its 10-minute
+   * (re)learning step: when it's due back. Such cards wait at the end of the
+   * queue; if one is first, nothing is due yet and the learner waits until then.
+   */
+  readonly notDueUntil?: Date;
 }
 
 /** A Grammar Note as a card shows it: the note plus the pattern it explains. */

@@ -70,6 +70,14 @@ export function capNewCards<T extends { id: string }>(newCards: readonly T[], { 
   return newCards.filter((card) => !bringsNewItem(card.id) || left-- > 0);
 }
 
+/** IDs of the cards graded today (the learner's local day). */
+export function reviewedToday({ events, now, settings }: DayContext): Set<string> {
+  const dayStart = startOfDay(now, settings.utcOffsetMinutes).getTime();
+  return new Set(
+    events.filter((event) => event.type === "card-reviewed" && new Date(event.at).getTime() >= dayStart).map((event) => event.cardId),
+  );
+}
+
 /**
  * Keeps only as many of `dueReviews` (already in priority order) as are left
  * of today's review cap; the rest roll over to a later day. A review is a
@@ -80,9 +88,7 @@ export function capNewCards<T extends { id: string }>(newCards: readonly T[], { 
 export function capReviews<T extends { id: string }>(dueReviews: readonly T[], { events, now, settings }: DayContext): T[] {
   const dayStart = startOfDay(now, settings.utcOffsetMinutes).getTime();
   const first = firstSeen(events);
-  const seenToday = new Set(
-    events.filter((event) => event.type === "card-reviewed" && new Date(event.at).getTime() >= dayStart).map((event) => event.cardId),
-  );
+  const seenToday = reviewedToday({ events, now, settings });
   let left = settings.reviewsPerDay - [...seenToday].filter((id) => (first.get(id) ?? 0) < dayStart).length;
   return dueReviews.filter((card) => seenToday.has(card.id) || left-- > 0);
 }
