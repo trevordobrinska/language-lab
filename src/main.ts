@@ -1,4 +1,5 @@
 import { korean } from "./content/packs";
+import { registerServiceWorker } from "./offline/registerServiceWorker";
 import { deviceId } from "./storage/deviceId";
 import { indexedDbHistoryLog } from "./storage/indexedDbHistoryLog";
 import { loadSettings, syncTarget, updateSettings } from "./storage/settings";
@@ -57,3 +58,4 @@ document.addEventListener("visibilitychange", () => {
 
 showReview();
 requestSync();
+registerServiceWorker();
