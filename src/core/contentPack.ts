@@ -22,6 +22,19 @@ export interface ContentPack {
    * they arrive inside the Sentence that introduces them.
    */
   readonly order: readonly string[];
+  /**
+   * The Missions this pack's Items serve, most important first. The first is
+   * Mission 1: Sentences bringing in its Items are introduced ahead of the
+   * authored order.
+   */
+  readonly missions?: readonly Mission[];
+}
+
+/** A real-world situation the learner is working towards, e.g. the market shop owner. */
+export interface Mission {
+  /** Used in Items' `missions` tags, e.g. "market". */
+  readonly id: string;
+  readonly name: string;
 }
 
 /**

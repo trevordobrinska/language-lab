@@ -1,23 +1,10 @@
-import type { ContentPack, Item } from "./contentPack";
+import { packCards, type Card } from "./cards";
+import type { ContentPack } from "./contentPack";
 import type { CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
+import { newMaterial } from "./newMaterial";
 import { schedule, type CardSchedule, type PastReview } from "./scheduler";
 
-/** One card in today's queue: what to show before and after the reveal. */
-export interface Card {
-  /** Stable ID used in History Log events, e.g. "letter:ko-g". */
-  readonly id: string;
-  readonly kind: "letter";
-  readonly front: {
-    /** Text to show, e.g. the letter. */
-    readonly text: string;
-    /** Audio path relative to the pack's folder, played on showing the front. */
-    readonly audio?: string;
-  };
-  readonly back: {
-    /** The answer to check recall against. */
-    readonly text: string;
-  };
-}
+export type { Card, CardKind } from "./cards";
 
 export interface QueueInput {
   readonly pack: ContentPack;
@@ -35,14 +22,10 @@ const LEARN_AHEAD_MS = 20 * 60 * 1000;
 
 /** Today's Review: the cards to show, in order. */
 export function buildQueue({ pack, events, now }: QueueInput): Card[] {
-  const items = new Map(pack.items.map((item) => [item.id, item]));
   const schedules = cardSchedules({ events, now });
-  const cards = pack.order.flatMap((id) => {
-    const item = items.get(id);
-    return item ? [letterCard(item)] : [];
-  });
+  const cards = packCards(pack);
   const dueBy = (card: Card) => schedules.get(card.id)?.due.getTime() ?? now.getTime();
-  const newCards = cards.filter((card) => !schedules.has(card.id));
+  const newCards = newMaterial(pack, events);
   const reviews = cards.filter((card) => schedules.has(card.id)).sort((a, b) => dueBy(a) - dueBy(b));
   const dueReviews = reviews.filter((card) => dueBy(card) <= now.getTime());
   const comingBack = reviews.filter(
@@ -101,13 +84,4 @@ export interface GradeContext {
 /** The learner graded a card: the History Log event to add. */
 export function gradeCard(card: Card, grade: Grade, { now, deviceId, eventId }: GradeContext): CardReviewedEvent {
   return { id: eventId, deviceId, at: now.toISOString(), type: "card-reviewed", cardId: card.id, grade };
-}
-
-function letterCard(item: Item): Card {
-  return {
-    id: `letter:${item.id}`,
-    kind: "letter",
-    front: { text: item.text, audio: item.audio },
-    back: { text: item.meaning },
-  };
 }
