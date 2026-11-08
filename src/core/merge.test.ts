@@ -32,7 +32,7 @@ describe("merging History Logs", () => {
     const fromMerge = buildQueue({ pack, events: mergeLogs(pc, phone), now });
 
     expect(fromMerge).toEqual(buildQueue({ pack, events: [...phone, ...pc], now }));
-    // ㄱ (Good a day ago) and ㄴ (Again just now) are due; ㅏ (Good on the PC 23 hours ago) is not yet.
-    expect(fromMerge.map((card) => card.front.text)).toEqual(["ㄱ", "ㄴ"]);
+    // ㄴ (Again just now) comes back in this Review; ㄱ and ㅏ (Good on their first review) are days away under FSRS.
+    expect(fromMerge.map((card) => card.front.text)).toEqual(["ㄴ"]);
   });
 });
