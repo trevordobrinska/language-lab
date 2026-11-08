@@ -7,12 +7,14 @@ import { backgroundSync } from "./sync/backgroundSync";
 import { githubRemoteLog } from "./sync/githubRemoteLog";
 import { syncHistoryLog } from "./sync/sync";
 import { showReviewScreen } from "./ui/reviewScreen";
+import { showHowReviewWorks } from "./ui/howReviewWorks";
+import { showProgressScreen } from "./ui/progressScreen";
 import { showSettingsScreen } from "./ui/settingsScreen";
 
 const root = document.getElementById("app")!;
 const log = indexedDbHistoryLog();
 const device = deviceId();
-let screen: "review" | "settings" = "review";
+let screen: "review" | "settings" | "progress" | "how-review-works" = "review";
 
 // Sync runs in the background and never blocks Review. With no token set, it does nothing.
 const syncer = backgroundSync({
@@ -47,15 +49,37 @@ const showReview = () => {
 };
 const showSettings = () => {
   screen = "settings";
-  showSettingsScreen({ root, requestSync, onBack: showReview });
+  showSettingsScreen({ root, requestSync, onBack: showReview, openHowReviewWorks: showHowItWorks });
+};
+const showProgress = () => {
+  screen = "progress";
+  void showProgressScreen({ root, pack: korean, log, onBack: showReview });
+};
+const showHowItWorks = () => {
+  screen = "how-review-works";
+  showHowReviewWorks({ root, doneLabel: "Back to settings", onDone: showSettings });
+};
+/** First launch: explain Review once, then start it. */
+const showFirstRun = () => {
+  screen = "how-review-works";
+  showHowReviewWorks({
+    root,
+    doneLabel: "Start Review",
+    onDone: () => {
+      updateSettings({ seenHowReviewWorks: true });
+      showReview();
+    },
+  });
 };
 
 document.getElementById("open-settings")!.addEventListener("click", showSettings);
+document.getElementById("open-progress")!.addEventListener("click", showProgress);
 window.addEventListener("online", requestSync);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") requestSync();
 });
 
-showReview();
+if (loadSettings().seenHowReviewWorks) showReview();
+else showFirstRun();
 requestSync();
 registerServiceWorker();

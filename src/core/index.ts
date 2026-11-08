@@ -10,3 +10,4 @@ export type { ContentPack, GrammarNote, Item, ItemKind, Mission, Sentence } from
 export { mergeLogs } from "./merge";
 export type { CardIntroducedEvent, CardReviewedEvent, Grade, HistoryEvent } from "./historyLog";
 export { checkContentPack } from "./contentCheck";
+export { progress, type Progress, type Tally } from "./progress";
