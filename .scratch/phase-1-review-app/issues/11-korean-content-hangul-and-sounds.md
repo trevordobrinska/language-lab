@@ -4,12 +4,12 @@
 
 **Blocked by:** 02, 03
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] All basic consonants and vowels are Items, with romanisation and audio
 - [x] Syllable-block Items show how letters combine
 - [x] The sound-contrast Items cover the three-way consonant contrasts
-- [ ] Audio is generated with the ticket 03 command, and a sample has been listened to (flag any garbled clips for the user)
+- [x] Audio is generated with the ticket 03 command, and a sample has been listened to (flag any garbled clips for the user)
 - [x] The content check passes
 
 ## Comments
@@ -47,3 +47,5 @@
 3. Fix a garbled clip by editing its `speech`, deleting the mp3, and rerunning.
 
 Also spot-check the Korean against Naver Dictionary if you like: the letter names and the word glosses (나 I, 소 cow, 산 mountain, 물 water, 밥 rice, 강 river, 국 soup, 옷 clothes, 꽃 flower).
+
+- 2026-11-08: User listen-checked the priority clips (5 contrasts, tricky letters, 옷/꽃) and a sample of Sentences: all audible, none garbled. The user is a beginner, so this confirms clarity, not native accuracy. Worth re-listening to the contrast clips against a native reference (e.g. Naver Dictionary pronunciation audio) once the ear has developed; regenerate any that are off by editing `speech` and rerunning `npm run audio`.
