@@ -62,6 +62,6 @@ export default defineConfig({
   },
   plugins: [serviceWorker()],
   test: {
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "scripts/**/*.test.ts"],
   },
 });
