@@ -4,12 +4,12 @@
 
 **Blocked by:** 12
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] About 150 word Items tagged Mission 2, each introduced by a Sentence with exactly one new Item, building only on earlier Items
 - [x] All Sentences use polite speech, with Grammar Notes for any new patterns
 - [x] Every Sentence has English, romanisation and generated audio
-- [ ] Korean has been spot-checked against a dictionary, with doubtful sentences flagged for the user
+- [x] Korean has been spot-checked against a dictionary, with doubtful sentences flagged for the user
 - [x] The content check passes, and the Korean pack totals about 300 word Items
 
 ## Comments
@@ -70,3 +70,8 @@
 **Open, for the user:**
 1. Run `npm run audio`, then listen-check a sample of the new clips: the dish names, 몇 분이세요?, 덜 맵게 해 주세요, 잘 먹겠습니다. Then tick the audio box.
 2. Check the doubtful list above on Naver Dictionary and fix any Sentence that's wrong. To change a Sentence's text, delete its audio and rerun `npm run audio`. Then tick the dictionary box.
+
+- 2026-11-08: User checked all 21 doubtful items, plus the suggested alternatives, on Naver; the table is in `../naver-check.md`. No Sentence's meaning is wrong. Two changes:
+  - 이거 할게요 came back as "I'll do this", since 할게요 only means "I'll have" in context, so it's gone. -(으)ㄹ게요 is now introduced by 이걸로 할게요 ("I'll have this one"). To keep one new Item per Sentence, a new Sentence 이걸로 주세요 ("I'll take this one, please") introduces 이걸로 just before it. The -(으)ㄹ게요 Grammar Note now uses 이걸로 할게요. The old clip was deleted and the new one generated with `npm run audio`. The Sentence count is unchanged.
+  - 국물이 시원해요: Naver, like Wiktionary, gives only "refreshing", so the gloss now starts "Lit. refreshing" before the soup sense.
+  - Naver's other differences were literal readings the pack's glosses already handle (사장님 "Mr. President"; 보통으로 "the usual", where 보통 means regular), or a machine-translation error on an alternative that isn't in the pack (먹고 갈게요 "I'll be back"). The romanisation of 쫄깃해요/바삭해요 stays as RR's ㅎ-aspiration rule gives it. A translation confirms meaning, not naturalness: the alternatives (잘 못 먹어요, 안 시켰는데요, 먹고 갈게요...) are still worth putting to a native speaker.

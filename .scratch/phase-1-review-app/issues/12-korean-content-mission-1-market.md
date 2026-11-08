@@ -4,13 +4,13 @@
 
 **Blocked by:** 07, 09, 11
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] About 150 word Items tagged Mission 1, each introduced by a Sentence with exactly one new Item
 - [x] All Sentences use polite speech (해요체)
 - [x] Every grammar pattern used has a Grammar Note
 - [x] Every Sentence has English, romanisation and generated audio
-- [ ] Korean has been spot-checked against a dictionary (e.g. Naver Dictionary), with doubtful sentences flagged for the user
+- [x] Korean has been spot-checked against a dictionary (e.g. Naver Dictionary), with doubtful sentences flagged for the user
 - [x] The content check passes
 
 ## Comments
@@ -69,4 +69,6 @@ The rest is conservative textbook phrasing, but **please check these on Naver Di
 **Open, for the user:**
 1. Run `npm run audio` (ticket 03 setup), listen-check a sample of the new Sentence clips (try the number and price Sentences), then tick the audio box.
 2. Check the doubtful list above against Naver Dictionary and fix any Sentence that's wrong. To change a Sentence's text, delete its audio and rerun `npm run audio`. Then tick the dictionary box.
+
+- 2026-11-08: User checked all 13 doubtful items, plus the suggested alternatives, on Naver; the table is in `../naver-check.md`. No Sentence's meaning is wrong. Where Naver's English differed, it read the dropped subject differently (볶아요 "I'll stir-fry it" vs the pack's vendor reading "You stir-fry it") or took an idiom literally (많이 파세요 "Sell a lot"), so the pack's glosses stand. Nothing in this ticket changed. A translation confirms meaning, not naturalness: the alternatives (볶아 드세요, 그냥 볼게요, 맛 좀 보세요...) are still worth putting to a native speaker.
 
