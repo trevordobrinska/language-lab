@@ -1,6 +1,6 @@
 # Phase 1: Review app with Korean starter content
 
-Status: ready-for-agent
+Status: built
 
 ## Problem Statement
 
@@ -191,3 +191,7 @@ A web app I add to my iPhone home screen. It works offline and gives me a daily 
 - **Korean accuracy:** Claude writes the Korean. Spot-check sentences against a dictionary (e.g. Naver Dictionary, which is free) during authoring, because a natural-sounding but wrong sentence is costly once memorised.
 - **iOS storage:** home-screen web apps on iOS are usually exempt from Safari's 7-day storage purge, but sync is the real backup. Don't rely on the device keeping the only copy.
 - **Romanisation in data:** sentences carry their romanisation even though it's only shown in week 1, so the content check can verify it and later languages (Mandarin pinyin) can use the same field.
+
+## Comments
+
+**2026-11-09 (close-out):** Built. Tickets 01–15 done (15 waits only on a few days of real use to check caps and Progress); `npm test` (110), typecheck and build pass; live at https://trevordobrinska.github.io/language-lab/ and installed on the iPhone.
