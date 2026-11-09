@@ -1,3 +1,4 @@
+import { startOver } from "./core";
 import { korean } from "./content/packs";
 import { registerServiceWorker } from "./offline/registerServiceWorker";
 import { deviceId } from "./storage/deviceId";
@@ -55,7 +56,12 @@ const showReview = () => {
 };
 const showSettings = () => {
   screen = "settings";
-  showSettingsScreen({ root, requestSync, onBack: showReview, openHowReviewWorks: showHowItWorks });
+  showSettingsScreen({ root, requestSync, onBack: showReview, openHowReviewWorks: showHowItWorks, startOver: startOverEverywhere });
+};
+/** Add a Reset to the History Log and sync it, so every device starts over. */
+const startOverEverywhere = async () => {
+  await log.add(startOver({ now: new Date(), deviceId: device, eventId: crypto.randomUUID() }));
+  requestSync();
 };
 const showProgress = () => {
   screen = "progress";

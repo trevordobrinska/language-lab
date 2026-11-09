@@ -1,6 +1,6 @@
 import { packCards, type Card } from "./cards";
 import type { ContentPack } from "./contentPack";
-import { byTimeThenId, type CardReviewedEvent, type Grade, type HistoryEvent } from "./historyLog";
+import { byTimeThenId, sinceLastReset, type CardEvent, type CardReviewedEvent, type Grade, type HistoryEvent, type ResetEvent } from "./historyLog";
 import { capNewCards, capReviews, DEFAULT_REVIEW_SETTINGS, mostAtRiskFirst, reviewedToday, type ReviewSettings } from "./dailyCaps";
 import { withGrammarNotes } from "./grammarNotes";
 import { newMaterial } from "./newMaterial";
@@ -32,7 +32,8 @@ const LEARN_AHEAD_MS = 20 * 60 * 1000;
  * yet back from their 10-minute step come last, marked `notDueUntil`; when
  * one of those is first, nothing is due right now.
  */
-export function buildQueue({ pack, events, now, settings }: QueueInput): Card[] {
+export function buildQueue({ pack, events: log, now, settings }: QueueInput): Card[] {
+  const events = sinceLastReset(log);
   const day = { events, now, settings: { ...DEFAULT_REVIEW_SETTINGS, ...settings } };
   const schedules = cardSchedules({ events, now });
   const cards = packCards(pack);
@@ -72,14 +73,14 @@ function interleave<T>(a: readonly T[], b: readonly T[]): T[] {
  */
 export function cardSchedules({ events, now }: Pick<QueueInput, "events" | "now">): Map<string, CardSchedule> {
   const schedules = new Map<string, CardSchedule>();
-  for (const [cardId, reviews] of reviewsByCard(events)) schedules.set(cardId, schedule(reviews, now));
+  for (const [cardId, reviews] of reviewsByCard(sinceLastReset(events))) schedules.set(cardId, schedule(reviews, now));
   return schedules;
 }
 
 /**
  * Each card's reviews, oldest first (in `byTimeThenId` order).
  */
-function reviewsByCard(events: readonly HistoryEvent[]): Map<string, PastReview[]> {
+function reviewsByCard(events: readonly CardEvent[]): Map<string, PastReview[]> {
   const sorted = events.filter((event): event is CardReviewedEvent => event.type === "card-reviewed").sort(byTimeThenId);
   const byCard = new Map<string, PastReview[]>();
   for (const event of sorted) {
@@ -101,4 +102,12 @@ export interface GradeContext {
 /** The learner graded a card: the History Log event to add. */
 export function gradeCard(card: Card, grade: Grade, { now, deviceId, eventId }: GradeContext): CardReviewedEvent {
   return { id: eventId, deviceId, at: now.toISOString(), type: "card-reviewed", cardId: card.id, grade };
+}
+
+/**
+ * The learner chose to start over: the History Log event to add. Schedules
+ * and progress then start from nothing, on every device once it syncs.
+ */
+export function startOver({ now, deviceId, eventId }: GradeContext): ResetEvent {
+  return { id: eventId, deviceId, at: now.toISOString(), type: "reset" };
 }

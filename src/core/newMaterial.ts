@@ -10,7 +10,7 @@ import {
 } from "./cards";
 import { mission1, type ContentPack, type Item, type Sentence } from "./contentPack";
 import { startOfDay } from "./days";
-import { seenCardIds, type HistoryEvent } from "./historyLog";
+import { seenCardIds, type CardEvent } from "./historyLog";
 
 /**
  * The new cards on offer today, in the order to introduce them (ticket 07).
@@ -28,7 +28,7 @@ import { seenCardIds, type HistoryEvent } from "./historyLog";
  * Sentence can make the next one eligible within the same queue. Daily caps
  * are applied by the caller.
  */
-export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[], utcOffsetMinutes: number): Card[] {
+export function newMaterial(pack: ContentPack, events: readonly CardEvent[], utcOffsetMinutes: number): Card[] {
   const seen = seenCardIds(events);
   const items = new Map(pack.items.map((item) => [item.id, item]));
   const sentences = pack.order.flatMap((id) => pack.sentences.filter((s) => s.id === id));
@@ -69,7 +69,7 @@ export function newMaterial(pack: ContentPack, events: readonly HistoryEvent[], 
 const SPEAKING_UNLOCK_GOOD_DAYS = 2;
 
 /** The learner's local days (as day-start times) on which each card was graded Good. */
-function goodDaysByCard(events: readonly HistoryEvent[], utcOffsetMinutes: number): Map<string, Set<number>> {
+function goodDaysByCard(events: readonly CardEvent[], utcOffsetMinutes: number): Map<string, Set<number>> {
   const days = new Map<string, Set<number>>();
   for (const event of events) {
     if (event.type !== "card-reviewed" || event.grade !== "good") continue;
@@ -88,7 +88,7 @@ function goodDaysByCard(events: readonly HistoryEvent[], utcOffsetMinutes: numbe
  *   has been graded Good at least once. Heard but only ever graded Again
  *   doesn't count. (Looser than Learned: a later Again doesn't undo it.)
  */
-function knownItems(pack: ContentPack, events: readonly HistoryEvent[], seen: ReadonlySet<string>): Set<string> {
+function knownItems(pack: ContentPack, events: readonly CardEvent[], seen: ReadonlySet<string>): Set<string> {
   const passed = new Set(events.filter((event) => event.type === "card-reviewed" && event.grade === "good").map((event) => event.cardId));
   const known = new Set<string>();
   for (const item of pack.items) if (isLetterOrSound(item) && seen.has(letterCardId(item.id))) known.add(item.id);

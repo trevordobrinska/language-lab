@@ -1,6 +1,6 @@
 import { isLetterOrSound, letterCardId, listeningCardId } from "./cards";
 import { mission1, type ContentPack, type Item } from "./contentPack";
-import { byTimeThenId, type CardReviewedEvent, type Grade, type HistoryEvent } from "./historyLog";
+import { byTimeThenId, sinceLastReset, type CardEvent, type CardReviewedEvent, type Grade } from "./historyLog";
 import { buildQueue, cardSchedules, type QueueInput } from "./review";
 
 /** A count out of a total, e.g. 40 of the pack's 300 Items learned. */
@@ -48,7 +48,8 @@ export interface Progress {
  *   extra practice, so it doesn't change either count.
  */
 export function progress(input: QueueInput): Progress {
-  const { pack, events, now } = input;
+  const { pack, now } = input;
+  const events = sinceLastReset(input.events);
   const latest = latestGrades(events);
   const learnedCard = (cardId: string | undefined) => cardId !== undefined && latest.get(cardId) === "good";
   const introducedBy = introducingCards(pack);
@@ -77,7 +78,7 @@ function introducingCards(pack: ContentPack): Map<string, string> {
 }
 
 /** Each reviewed card's latest grade. Latest in `byTimeThenId` order. */
-function latestGrades(events: readonly HistoryEvent[]): Map<string, Grade> {
+function latestGrades(events: readonly CardEvent[]): Map<string, Grade> {
   const latest = new Map<string, CardReviewedEvent>();
   for (const event of events) {
     if (event.type !== "card-reviewed") continue;

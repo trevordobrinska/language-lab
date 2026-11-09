@@ -14,21 +14,37 @@ interface EventBase {
   readonly deviceId: string;
   /** When it happened, as an ISO 8601 date and time (UTC). */
   readonly at: string;
+}
+
+interface CardEventBase extends EventBase {
   readonly cardId: string;
 }
 
 /** The learner graded a card after revealing it. */
-export interface CardReviewedEvent extends EventBase {
+export interface CardReviewedEvent extends CardEventBase {
   readonly type: "card-reviewed";
   readonly grade: Grade;
 }
 
 /** A new card was shown for the first time. */
-export interface CardIntroducedEvent extends EventBase {
+export interface CardIntroducedEvent extends CardEventBase {
   readonly type: "card-introduced";
 }
 
-export type HistoryEvent = CardReviewedEvent | CardIntroducedEvent;
+/**
+ * The learner chose to start over. Every event before it (in `byTimeThenId`
+ * order, from any device) is ignored when calculating schedules and progress,
+ * but stays in the log: nothing is deleted. It syncs like any other event, so
+ * one Reset on any device starts every device over.
+ */
+export interface ResetEvent extends EventBase {
+  readonly type: "reset";
+}
+
+/** An event about one card. */
+export type CardEvent = CardReviewedEvent | CardIntroducedEvent;
+
+export type HistoryEvent = CardEvent | ResetEvent;
 
 /**
  * The one order of History Log events: oldest first, ties broken by event ID,
@@ -38,8 +54,18 @@ export function byTimeThenId(a: HistoryEvent, b: HistoryEvent): number {
   return Date.parse(a.at) - Date.parse(b.at) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 }
 
+/**
+ * The card events that count: those after the latest Reset, or all of them
+ * if there's none. Every calculation starts from this.
+ */
+export function sinceLastReset(events: readonly HistoryEvent[]): CardEvent[] {
+  let lastReset: ResetEvent | undefined;
+  for (const event of events) if (event.type === "reset" && (!lastReset || byTimeThenId(event, lastReset) > 0)) lastReset = event;
+  return events.filter((event): event is CardEvent => event.type !== "reset" && (!lastReset || byTimeThenId(event, lastReset) > 0));
+}
+
 /** When each card first appeared in the History Log (introduced or first reviewed), as epoch ms by card ID. */
-export function firstSeen(events: readonly HistoryEvent[]): Map<string, number> {
+export function firstSeen(events: readonly CardEvent[]): Map<string, number> {
   const first = new Map<string, number>();
   for (const event of events) {
     const at = Date.parse(event.at);
@@ -50,6 +76,6 @@ export function firstSeen(events: readonly HistoryEvent[]): Map<string, number> 
 }
 
 /** Every card ID with any event in the History Log. */
-export function seenCardIds(events: readonly HistoryEvent[]): Set<string> {
+export function seenCardIds(events: readonly CardEvent[]): Set<string> {
   return new Set(events.map((event) => event.cardId));
 }

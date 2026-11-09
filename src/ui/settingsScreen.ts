@@ -9,6 +9,8 @@ export interface SettingsScreenDeps {
   readonly onBack: () => void;
   /** Reopen the first-run "How Review works" screen. */
   readonly openHowReviewWorks: () => void;
+  /** Add a Reset to the History Log (the learner has already confirmed). */
+  readonly startOver: () => Promise<void>;
 }
 
 /**
@@ -23,9 +25,28 @@ export interface SectionContext {
   readonly save: (changes: Partial<Settings>) => void;
   readonly requestSync: () => void;
   readonly openHowReviewWorks: () => void;
+  readonly startOver: () => Promise<void>;
 }
 
-const SECTIONS: readonly SettingsSection[] = [dailyCapsSection, syncSection, howReviewWorksSection];
+const SECTIONS: readonly SettingsSection[] = [dailyCapsSection, syncSection, howReviewWorksSection, startOverSection];
+
+function startOverSection({ startOver }: SectionContext): HTMLElement {
+  const status = el("p", "hint", "");
+  const confirmAndStartOver = async () => {
+    const sure = window.confirm(
+      "Start over from nothing? Every card becomes new again and your progress goes back to zero, on every device once it syncs. Your past reviews stay in the History Log but stop counting.",
+    );
+    if (!sure) return;
+    await startOver();
+    status.textContent = "Done. Your next Review starts from the beginning.";
+  };
+  return el("section", "settings-section", "", [
+    el("h2", "", "Start over"),
+    el("p", "hint", "Set every card back to new and your progress to zero, on all your devices. Can't be undone."),
+    button("save", "Start over", () => void confirmAndStartOver()),
+    status,
+  ]);
+}
 
 function howReviewWorksSection({ openHowReviewWorks }: SectionContext): HTMLElement {
   return el("section", "settings-section", "", [
@@ -74,12 +95,13 @@ function numberInput(value: number): HTMLInputElement {
 }
 
 /** The settings screen. Re-render it (call again) to refresh the last sync time. */
-export function showSettingsScreen({ root, requestSync, onBack, openHowReviewWorks }: SettingsScreenDeps): void {
+export function showSettingsScreen({ root, requestSync, onBack, openHowReviewWorks, startOver }: SettingsScreenDeps): void {
   const context: SectionContext = {
     settings: loadSettings(),
     save: (changes) => void updateSettings(changes),
     requestSync,
     openHowReviewWorks,
+    startOver,
   };
   root.replaceChildren(
     el("h1", "settings-title", "Settings"),

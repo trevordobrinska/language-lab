@@ -1,5 +1,5 @@
 import type { ContentPack, Item, Sentence } from "./contentPack";
-import type { Grade, HistoryEvent } from "./historyLog";
+import type { CardReviewedEvent, Grade } from "./historyLog";
 
 /** A letter Item for test packs. */
 export function letter(id: string, text: string, meaning: string, extra: Partial<Item> = {}): Item {
@@ -48,7 +48,7 @@ export function packWith(items: readonly Item[], sentences: readonly Sentence[],
 let nextEventNumber = 0;
 
 /** A card-reviewed History Log event at the given time. */
-export function reviewed(cardId: string, grade: Grade, at: Date, deviceId = "test-device"): HistoryEvent {
+export function reviewed(cardId: string, grade: Grade, at: Date, deviceId = "test-device"): CardReviewedEvent {
   return { id: `event-${++nextEventNumber}`, deviceId, at: at.toISOString(), type: "card-reviewed", cardId, grade };
 }
 
