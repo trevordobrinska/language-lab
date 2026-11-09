@@ -46,7 +46,11 @@ export function githubRemoteLog({ token, owner, repo }: GitHubRepo, fetchFn: typ
   return {
     async list() {
       const paths: string[] = [];
-      for (const device of await listDir(HISTORY_DIR)) {
+      const devices = await listDir(HISTORY_DIR);
+      // No history folder is normal for a new data repo, but a wrong repo name or a token
+      // without access to the repo also gives 404: tell them apart by the repo's root.
+      if (devices.length === 0 && (await request("")).status === 404) throw new Error("GitHub GET (data repo): 404");
+      for (const device of devices) {
         if (device.type !== "dir") continue;
         for (const file of await listDir(device.path)) {
           if (file.type !== "file" || !file.name.endsWith(".jsonl")) continue;

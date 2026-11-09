@@ -5,6 +5,7 @@ import { indexedDbHistoryLog } from "./storage/indexedDbHistoryLog";
 import { loadSettings, syncTarget, updateSettings } from "./storage/settings";
 import { backgroundSync } from "./sync/backgroundSync";
 import { githubRemoteLog } from "./sync/githubRemoteLog";
+import { describeSyncError } from "./sync/syncError";
 import { syncHistoryLog } from "./sync/sync";
 import { showReviewScreen } from "./ui/reviewScreen";
 import { showHowReviewWorks } from "./ui/howReviewWorks";
@@ -28,10 +29,15 @@ const syncer = backgroundSync({
   retryAfterMs: 5 * 60 * 1000,
   onSynced: (at) => {
     if (!syncTarget(loadSettings())) return;
-    updateSettings({ lastSyncAt: at.toISOString() });
+    updateSettings({ lastSyncAt: at.toISOString(), lastSyncError: undefined });
     if (screen === "settings") showSettings();
   },
-  onFailed: (error) => console.warn("History Log sync failed; will retry", error),
+  onFailed: (error) => {
+    console.warn("History Log sync failed; will retry", error);
+    if (!syncTarget(loadSettings())) return;
+    updateSettings({ lastSyncError: describeSyncError(error) });
+    if (screen === "settings") showSettings();
+  },
 });
 const requestSync = () => {
   if (navigator.onLine) void syncer.syncNow();

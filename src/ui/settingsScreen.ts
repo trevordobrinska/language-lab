@@ -117,8 +117,8 @@ function syncSection({ settings, save, requestSync }: SectionContext): HTMLEleme
 
 function syncStatus(settings: Settings): string {
   if (!syncTarget(settings)) return "Sync is off until a token and data repo are set.";
-  if (!settings.lastSyncAt) return "Not synced yet.";
-  return `Last synced ${new Date(settings.lastSyncAt).toLocaleString()}.`;
+  const last = settings.lastSyncAt ? `Last synced ${new Date(settings.lastSyncAt).toLocaleString()}.` : "Not synced yet.";
+  return settings.lastSyncError ? `${last} Latest attempt failed: ${settings.lastSyncError}` : last;
 }
 
 function input(type: string, placeholder: string, value = ""): HTMLInputElement {
@@ -128,6 +128,9 @@ function input(type: string, placeholder: string, value = ""): HTMLInputElement 
   node.value = value;
   node.autocomplete = "off";
   node.spellcheck = false;
+  // iOS would otherwise capitalise and "correct" tokens and repo names.
+  node.autocapitalize = "off";
+  node.setAttribute("autocorrect", "off");
   return node;
 }
 

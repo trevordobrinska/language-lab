@@ -12,6 +12,8 @@ export interface Settings {
   readonly dataRepoName?: string;
   /** When the last sync succeeded, as an ISO 8601 date and time. */
   readonly lastSyncAt?: string;
+  /** Why the most recent sync failed; cleared by the next successful sync. */
+  readonly lastSyncError?: string;
   /** Daily caps (spec "Missed days"). Unset means the core's defaults (15 and 150). */
   readonly newItemsPerDay?: number;
   readonly reviewsPerDay?: number;
