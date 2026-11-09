@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildQueue, cardSchedules, type Card, type ContentPack, type HistoryEvent } from "./index";
+import { buildQueue, cardSchedules, type Card, type CardEvent, type ContentPack } from "./index";
 import { later, letter, packOf, reviewed } from "./testing";
 
 const START = new Date("2026-11-07T08:00:00Z");
@@ -9,12 +9,12 @@ function bigPack(count: number): ContentPack {
   return packOf(Array.from({ length: count }, (_, i) => letter(`l${i}`, `L${i}`, `meaning ${i}`)));
 }
 
-const isNew = (events: readonly HistoryEvent[]) => (card: Card) => !events.some((event) => event.cardId === card.id);
+const isNew = (events: readonly CardEvent[]) => (card: Card) => !events.some((event) => event.cardId === card.id);
 
 describe("the daily new-Item cap", () => {
   it("never introduces more than the cap in a day, however much the learner studies", () => {
     const pack = bigPack(40);
-    const events: HistoryEvent[] = [];
+    const events: CardEvent[] = [];
     let now = START;
     // Keep studying all day: grade every card shown, a minute apart, until the queue empties.
     for (let step = 0; step < 500; step++) {
@@ -64,7 +64,7 @@ describe("the daily review cap", () => {
   const caps = { reviewsPerDay: 10, newItemsPerDay: 0 };
 
   /** Grades every card in the queue Good, a minute apart, until it's empty. Returns the cards shown. */
-  function studyAll(events: HistoryEvent[], from: Date): string[] {
+  function studyAll(events: CardEvent[], from: Date): string[] {
     const shown: string[] = [];
     let now = from;
     for (let step = 0; step < 200; step++) {

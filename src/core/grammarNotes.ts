@@ -1,6 +1,6 @@
 import { listeningCardId, speakingCardId, type Card, type CardGrammarNote } from "./cards";
 import type { ContentPack } from "./contentPack";
-import { seenCardIds, type HistoryEvent } from "./historyLog";
+import { seenCardIds, type CardEvent } from "./historyLog";
 
 /**
  * When each Grammar Note is shown (spec "Review core").
@@ -12,7 +12,7 @@ import { seenCardIds, type HistoryEvent } from "./historyLog";
  *   `noteBeforeCard`, so the note shows before it. Once a card using the
  *   pattern has been graded, the note isn't shown automatically again.
  */
-export function withGrammarNotes(cards: readonly Card[], pack: ContentPack, events: readonly HistoryEvent[]): Card[] {
+export function withGrammarNotes(cards: readonly Card[], pack: ContentPack, events: readonly CardEvent[]): Card[] {
   const notes = cardNotes(pack);
   if (notes.size === 0) return [...cards];
 

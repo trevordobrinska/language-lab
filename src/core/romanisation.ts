@@ -1,6 +1,6 @@
 import type { Card } from "./cards";
 import { DAY_MS, startOfDay } from "./days";
-import type { HistoryEvent } from "./historyLog";
+import type { CardEvent } from "./historyLog";
 
 /**
  * Week-1 romanisation (spec "Decisions"): cards show romanisation as training
@@ -13,7 +13,7 @@ import type { HistoryEvent } from "./historyLog";
 export const ROMANISATION_DAYS = 7;
 
 /** Whether `now` falls within the learner's first `ROMANISATION_DAYS` local days. */
-export function inRomanisationWeek(events: readonly HistoryEvent[], now: Date, utcOffsetMinutes: number): boolean {
+export function inRomanisationWeek(events: readonly CardEvent[], now: Date, utcOffsetMinutes: number): boolean {
   if (events.length === 0) return true;
   const first = events.reduce((min, event) => Math.min(min, new Date(event.at).getTime()), Infinity);
   const day1 = startOfDay(new Date(first), utcOffsetMinutes).getTime();

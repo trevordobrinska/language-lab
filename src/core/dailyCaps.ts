@@ -1,6 +1,6 @@
 import { bringsNewItem, type Card } from "./cards";
 import { startOfDay } from "./days";
-import { firstSeen, type HistoryEvent } from "./historyLog";
+import { firstSeen, type CardEvent } from "./historyLog";
 import type { CardSchedule } from "./scheduler";
 
 /**
@@ -34,7 +34,7 @@ export function mostAtRiskFirst<T extends { id: string }>(dueCards: readonly T[]
 }
 
 export interface DayContext {
-  readonly events: readonly HistoryEvent[];
+  readonly events: readonly CardEvent[];
   readonly now: Date;
   readonly settings: ReviewSettings;
 }

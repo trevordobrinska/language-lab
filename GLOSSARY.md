@@ -50,6 +50,10 @@ _Avoid_: Grammar lesson, chapter
 The add-only record of every review and session the learner has done, from which all progress and scheduling are calculated.
 _Avoid_: Progress, save data, stats
 
+**Reset**:
+A History Log event recording that the learner chose to start over. Schedules and progress are calculated only from events after the latest Reset; earlier events stay in the log but stop counting. It syncs like any other event, so one Reset starts every device over.
+_Avoid_: Wipe, delete history, clear data
+
 **Learned**:
 An Item or Sentence whose introducing card (a letter card, or the Listening Card of the Sentence that introduces it) was graded Good the last time it was reviewed. Graded Again, it stops counting until passed again. Progress counts are built on this. A new Sentence uses a looser bar to decide whether its other Items are familiar enough: a word or grammar Item counts once its introducing Listening Card has been graded Good at least once (a later Again doesn't undo it), and a letter or sound counts once its letter card has been reviewed at all.
 _Avoid_: Known, mastered, completed
