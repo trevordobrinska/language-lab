@@ -6,11 +6,11 @@
 
 **Status:** ready-for-human
 
-- [ ] Added to the iPhone home screen, it opens as a standalone app
-- [ ] A full Review works in airplane mode, including audio
+- [x] Added to the iPhone home screen, it opens as a standalone app
+- [x] A full Review works in airplane mode, including audio
 - [x] After pasting the token and going back online, the phone's log file appears in the private data repo, and the last sync time updates
-- [ ] A Review done in the PC browser merges into the phone's queue
-- [ ] A random sample of audio clips (Hangul and sentences) has been listened to, and any garbled ones are noted for regeneration
+- [x] A Review done in the PC browser merges into the phone's queue
+- [x] A random sample of audio clips (Hangul and sentences) has been listened to, and any garbled ones are noted for regeneration
 - [ ] The daily caps and progress screen behave as expected over a few real days
 
 ## Comments
@@ -20,3 +20,4 @@
   - With that, the phone showed "Couldn't reach GitHub", meaning `fetch` threw a TypeError. Cause: `githubRemoteLog` passed `cache: "no-store"`, which Safari turns into `Cache-Control` and `Pragma` request headers. GitHub's CORS preflight doesn't allow either (checked with an OPTIONS request), so Safari blocked every request. Chrome doesn't add them, so the PC worked.
   - `e810c17`: dropped the cache mode. GETs add a unique `?t=` query instead, to stay fresh. `githubRemoteLog.test.ts` checks that every request sends only headers GitHub allows.
   - After the fix, the phone synced: `history/b5e19203-ac6f-4a13-99c8-2c53a930fb73/2026-11.jsonl` (2026-11-09 01:34 UTC), next to the PC's log.
+- 2026-11-08: User confirmed the home-screen install (standalone), a full Review with audio in airplane mode, PC → phone merge (the PC's log was already in the data repo when the phone first synced at 01:34 UTC) and a random audio sample with no garbled clips. Only the multi-day check of daily caps and the Progress screen is left; tick it, set `Status: resolved`, and Phase 1 is done.

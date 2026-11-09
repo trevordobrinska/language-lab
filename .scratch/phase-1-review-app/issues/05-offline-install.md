@@ -6,9 +6,9 @@
 
 **Status:** resolved
 
-- [ ] A web app manifest and icons let the app be added to the home screen and open in standalone mode (built; hand check on the iPhone, ticket 15)
-- [ ] Once loaded, a Review works with the network turned off, including audio (built; hand check on the iPhone, ticket 15)
-- [ ] Publishing a new build is picked up on the next open, with no manual reinstall (built; hand check on the iPhone, ticket 15)
+- [x] A web app manifest and icons let the app be added to the home screen and open in standalone mode (built; hand check on the iPhone, ticket 15)
+- [x] Once loaded, a Review works with the network turned off, including audio (built; hand check on the iPhone, ticket 15)
+- [x] Publishing a new build is picked up on the next open, with no manual reinstall (built; hand check on the iPhone, ticket 15)
 - [x] Every storage and cache name starts with `language-lab`
 - [x] The app works when served from a sub-path (the Language Lab path on the GitHub Pages domain)
 
@@ -31,3 +31,5 @@
 2. Open it once online, wait a few seconds, then switch to airplane mode, force-quit, and reopen. A full Review should run, including audio playback.
 3. Publish a visibly changed build. Open the app online, either relaunched or resumed. Within a few seconds it should reload once into the new version. In Safari's Web Inspector (Storage > Cache Storage), only one `language-lab-app-*` cache should remain, and any Arcade caches should be untouched.
 4. All localStorage keys, IndexedDB databases and caches should start with `language-lab`.
+
+- 2026-11-08: Hand-checked on the iPhone during ticket 15. The app opens standalone from the home screen, and a full Review with audio ran in airplane mode. Two new builds published during the sync fix (`d804298`, `e810c17`) each reached the home-screen app on reopen, with no reinstall. The Web Inspector cache check (step 3) wasn't done.
