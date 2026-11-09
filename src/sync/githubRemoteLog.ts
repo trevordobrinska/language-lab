@@ -9,7 +9,8 @@ export interface GitHubRepo {
 
 /**
  * The remote History Log in a private GitHub repo, through the contents API
- * (ADR 0003). Not unit-tested: `memoryRemoteLog` stands in for it in tests.
+ * (ADR 0003). Sync logic is tested against `memoryRemoteLog`; githubRemoteLog.test.ts
+ * checks only the requests (headers GitHub's CORS allows, fresh GETs).
  *
  * Updating a file needs its current blob SHA, which `list()` collects from
  * the directory listings. A write with a stale SHA fails, and the next sync
@@ -22,12 +23,15 @@ export function githubRemoteLog({ token, owner, repo }: GitHubRepo, fetchFn: typ
       .split("/")
       .map(encodeURIComponent)
       .join("/")}`;
-  const request = async (path: string, init: RequestInit & { accept?: string } = {}) => {
-    const response = await fetchFn(url(path), {
+  const request = async (path: string, { accept, ...init }: RequestInit & { accept?: string } = {}) => {
+    // No `cache: "no-store"`: Safari turns it into Cache-Control and Pragma request headers,
+    // which GitHub's CORS preflight doesn't allow, so every request failed on the iPhone.
+    // A unique query string keeps GETs fresh without adding headers.
+    const fresh = init.method ? "" : `?t=${Date.now()}`;
+    const response = await fetchFn(url(path) + fresh, {
       ...init,
-      cache: "no-store",
       headers: {
-        Accept: init.accept ?? "application/vnd.github+json",
+        Accept: accept ?? "application/vnd.github+json",
         Authorization: `Bearer ${token}`,
         "X-GitHub-Api-Version": "2022-11-28",
         ...(init.body ? { "Content-Type": "application/json" } : {}),
