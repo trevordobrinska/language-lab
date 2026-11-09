@@ -7,12 +7,12 @@
 
 **Blocked by:** 05, 06
 
-**Status:** ready-for-human
+**Status:** resolved
 
 - [x] The public app repo exists, and Pages serves the app at the Language Lab path
 - [x] The private data repo exists
-- [ ] A fine-grained token limited to the data repo (contents read/write only) exists and is stored somewhere safe
-- [ ] Opening the published app in the PC browser runs a Review
+- [x] A fine-grained token limited to the data repo (contents read/write only) exists and is stored somewhere safe
+- [x] Opening the published app in the PC browser runs a Review
 
 ## Comments
 
@@ -25,3 +25,5 @@
 **Open, for the user:**
 1. Create the token. GitHub has no API for fine-grained tokens, so do it at https://github.com/settings/personal-access-tokens/new: name it `language-lab-sync`, choose **Only select repositories** → `language-lab-data`, and under Repository permissions set **Contents: Read and write** (Metadata: read-only is added automatically). Store it in your password manager.
 2. Open the live app on the PC. In Settings, enter the token, owner `trevordobrinska` and repo `language-lab-data`, then run a Review. Check that a log file appears in the data repo, then tick the last two boxes.
+
+- 2026-11-08: User created the fine-grained token (scoped to `language-lab-data`) and entered it in the PC app's Settings. A Review on the published app worked, and sync committed `history/d8e2dccb-bbcb-4ae5-ac1f-441c260c2b86/2026-11.jsonl` to the data repo ("History Log: …", 2026-11-09 01:00 UTC). Ticket 15 (iPhone check) is now unblocked.
